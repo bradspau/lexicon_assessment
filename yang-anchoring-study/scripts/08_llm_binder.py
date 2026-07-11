@@ -2,20 +2,14 @@
 LLM binder, name-only vs definition-based (plan step 8).
 
 DEVIATION FROM PLAN: no ANTHROPIC_API_KEY is available in this environment,
-so this does not call the `anthropic` SDK. Instead the binding judgments in
-scripts/_phase2_bindings_data.py were produced by direct reasoning against
-the exact same prompts the plan's `bind()` function would have sent (see
-lexicon_block/node_block below, kept byte-for-byte structurally identical
-to the plan so the prompts are documented even though they were applied
-by hand rather than submitted over the API).
-
-IMPORTANT METHODOLOGY CAVEAT (see report/FINDINGS.md): the same agent that
-hand-authored data/gold/gold_standard.csv also produced these binding
-judgments, in the same conversation. This is NOT a blind evaluation -- true
-independent-model blindness would require a separate `anthropic` API call
-per plan's original design. Treat Phase 2's numbers as a worked
-demonstration of the pipeline and a row-level illustration of the trap
-mechanism, not as an unbiased capability estimate.
+so this does not call the `anthropic` SDK directly. Instead the binding
+judgments in scripts/_phase2_bindings_data.py were collected via 78
+independent, isolated subagent tool calls (39 candidates x 2 modes) using
+the coding harness's Agent tool -- each a fresh model instance with no
+filesystem access and no visibility into this conversation or
+data/gold/gold_standard.csv, given only the literal prompt text below. This
+is a genuine blind evaluation (see report/FINDINGS.md for the full
+breakdown of the results, which matter more than the bare F1 numbers).
 """
 import pandas as pd
 import yaml
@@ -27,7 +21,15 @@ from _phase2_bindings_data import NAME_ONLY, DEFINITION_BASED
 lexicon = yaml.safe_load(open("data/lexicon/lexicon.yaml"))
 gold = pd.read_csv("data/gold/gold_standard.csv")
 nodes = pd.read_csv("data/results/phase1_scored_nodes.csv", keep_default_na=False)
-candidates = gold.merge(nodes[["corpus", "module", "path", "description"]], on=["corpus", "module", "path"])
+# only pull path/description as candidate-set filter keys -- gold's own
+# lexicon_id/relation columns are intentionally NOT merged in here (this
+# script produces predictions, not answers; scoring against gold happens
+# separately in 09_score_binding.py). Merging the full gold frame previously
+# caused a silent column collision: gold's "relation" and the predicted
+# "relation" both survived the merge, with gold's shadowing the prediction.
+candidates = gold[["corpus", "module", "path"]].merge(
+    nodes[["corpus", "module", "path", "description"]], on=["corpus", "module", "path"]
+)
 
 
 def lexicon_block(mode):

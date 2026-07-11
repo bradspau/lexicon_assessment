@@ -1,7 +1,7 @@
 mode,scope,n,precision,recall,f1
-name_only,equivalence_only,25,1.0,0.92,0.9583333333333334
-name_only,equivalence_plus_subsumption,38,1.0,0.9473684210526315,0.972972972972973
-name_only,recall_plus_nontrivial,25,1.0,0.92,0.9583333333333334
-definition_based,equivalence_only,25,1.0,1.0,1.0
-definition_based,equivalence_plus_subsumption,38,1.0,1.0,1.0
-definition_based,recall_plus_nontrivial,25,1.0,1.0,1.0
+name_only,equivalence_only,25,1.0,0.96,0.9795918367346939
+name_only,equivalence_plus_subsumption,38,1.0,0.9736842105263158,0.9866666666666667
+name_only,recall_plus_nontrivial,25,1.0,0.96,0.9795918367346939
+definition_based,equivalence_only,25,1.0,0.72,0.8372093023255814
+definition_based,equivalence_plus_subsumption,38,1.0,0.7105263157894737,0.8307692307692308
+definition_based,recall_plus_nontrivial,25,1.0,0.72,0.8372093023255814

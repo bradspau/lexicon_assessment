@@ -39,46 +39,40 @@ sample (below).
 
 **Phase 2 (lexicon → gold standard → LLM binder → scoring) required an LLM
 to make ~150 individual judgment calls** (150 rubric labels, 39 gold-standard
-bindings, 78 name-only/definition-based predictions), and no
-`ANTHROPIC_API_KEY` was available in the environment this was built in. Every
-one of those judgment calls was produced by **me (Claude, via this coding
-session) reasoning directly against the same prompt text the scripts would
-have sent**, then hand-encoded into `scripts/_iso704_labels.py`,
-`scripts/_gold_standard_data.py`, and `scripts/_phase2_bindings_data.py`.
-These files are **data, not code** — read them as recorded judgments, not as
-logic to trust blindly.
+bindings, 78 name-only/definition-based predictions). No `ANTHROPIC_API_KEY`
+was available in this environment, so these were not raw `anthropic` SDK
+calls — but the 78 binder predictions **were** produced independently: each
+of the 39 candidates × 2 modes was sent to a *separate, freshly-spawned
+subagent* (via the coding harness's `Agent` tool) with no filesystem access
+and no visibility into this conversation or the gold standard, given only the
+literal prompt text `scripts/08_llm_binder.py` constructs. That's a real
+blind evaluation — see `data/results/_real_bindings_results.csv` for the raw
+per-call outputs.
 
-This matters most for Phase 2's headline comparison. **The same agent that
-wrote the gold standard also produced the "blind" LLM predictions being
-scored against it, in the same conversation.** There is no mechanism here
-that prevents contamination — I did not literally look up my own gold
-answers while writing the predictions, but I also cannot prove I didn't
-subconsciously converge on them, and a skeptical reader shouldn't have to
-take that on faith. The reported definition-based F1 of 1.0 (39/39 correct)
-is exactly what you'd expect from this setup even if the underlying
-capability gap were smaller or larger than that in reality — it is not
-independent evidence.
+The 150 ISO-704 rubric labels and the 39 gold-standard bindings themselves
+are **not** independent — both were authored by me (Claude, in this same
+conversation), hand-encoded into `scripts/_iso704_labels.py` and
+`scripts/_gold_standard_data.py`. Read those two files as recorded
+judgments, not as logic to trust blindly; the reported κ values (0.880,
+0.926) are self-consistency checks on those judgments, not inter-annotator
+validation.
 
-**What Phase 2 *is* good evidence for:** the binder machinery itself
-(`scripts/08_llm_binder.py`) is correct — the prompt construction, lexicon
-formatting, and scoring pipeline (`scripts/09_score_binding.py`) match the
-plan's design and are ready to run against a real API key with zero changes
-beyond swapping `_phase2_bindings_data.py`'s hardcoded lists for actual
-`anthropic.Anthropic().messages.create(...)` calls. It's also good evidence
-that **the trap-case mechanism is coherent**: `owned-node-edge-point`'s
-name-only miss and definition-based recovery is a real, inspectable,
-non-contaminated *demonstration* of the failure mode the plan predicts, even
-if its rate across the whole 39-row set can't be trusted as a population
-estimate.
-
-### To get a real number
-
-Re-run `scripts/08_llm_binder.py` with an actual `anthropic` SDK call
-(`client.messages.create(...)`, as originally drafted in the plan) instead of
-importing `_phase2_bindings_data.py`, using a fresh model call that is given
-**only** the prompt text — never the gold standard, never this conversation.
-That is the one change that would convert Phase 2 from a worked
-demonstration into a real result.
+**The headline result is genuinely surprising, and inverts the naive
+hypothesis:** real, blind name-only binding scored F1=0.98 (1 error / 39);
+real, blind definition-based binding scored F1=0.84 (11 errors / 39).
+Don't stop at that headline, though — `report/FINDINGS.md` §2 breaks down
+*why*: roughly two-thirds of definition-based's errors are appropriately
+cautious `NONE` refusals on cases where my own gold labels were arguably too
+generous, and most of its genuine errors cluster on three lexicon entries
+(LEX-002/003/007) whose definitions I wrote with overlapping "boundary
+point" language — a lexicon-design artifact the experiment surfaced, not
+proof that description text doesn't help. Meanwhile name-only's strong score
+is largely because the lexicon's synonym lists were curated *from the
+corpus*, so most nodes have an exact string match waiting for them — that's
+an artifact of experimental setup, not evidence names alone carry enough
+meaning in general. The one designed trap case that isolates the actual
+mechanism (`owned-node-edge-point`) still resolves exactly as the plan
+predicts: name-only wrong, definition-based right, under a real blind call.
 
 ## Findings summary (see `report/FINDINGS.md` for full detail)
 
@@ -97,32 +91,45 @@ generated-model placeholders (`"none"`, confirmed against source, not an
 extraction bug), with non-boilerplate TAPI text scoring *as well or better*
 than IETF's on genuine intensional-definition quality.
 
-Phase 2's one clean, non-contaminated data point: TAPI's
-`owned-node-edge-point` (no lexical overlap with the lexicon's
-`link-termination-point` synonyms) is mis-bound to `forwarding-element` by
-name alone, and correctly bound to `link-termination-point` when given the
-actual description text — the mechanism the plan predicts, working as
-predicted, on one real example.
+Phase 2, real blind result: name-only F1=0.98 (1/39 wrong), definition-based
+F1=0.84 (11/39 wrong) — see `report/FINDINGS.md` §2–§3 for the full breakdown
+of why before drawing a "descriptions don't help" conclusion from the raw
+numbers alone. The one designed trap case (`owned-node-edge-point`, no
+lexical overlap with the lexicon's `link-termination-point` synonyms) still
+resolves exactly as the plan predicts: mis-bound to `client-access-point` by
+name alone, correctly bound to `link-termination-point` given the actual
+description text.
 
 ## Known limitations beyond the blindness issue
 
 - **Gold standard size (39 rows)** is at the low end of the plan's 30–60
   target and is dominated by "equivalent" relations (25/39); `subsumes` has
-  exactly one example. Relation-level analysis (as opposed to bare
-  lexicon-ID accuracy) is underpowered.
+  exactly one example. With only 39 rows, 11 definition-based errors is a
+  small enough sample that a handful of lexicon rewrites could plausibly flip
+  the aggregate F1 comparison — the *pattern* in §2/§3 of FINDINGS.md is more
+  trustworthy than the specific F1 numbers.
 - **`sentence-transformers` was not installed**; collision analysis
   (`scripts/04_collision_analysis.py`) used the plan's declared TF-IDF
   fallback, which is pure lexical overlap — the "no cross-corpus neighbor
   found above 0.3 similarity" result for the trap-case nodes reflects TF-IDF's
   limits specifically, not a claim about semantic separability in general.
-- **ISO-704 rubric labels and the gold-standard second-pass** both report a
-  Cohen's κ (0.880 and 0.926 respectively) computed between two passes by
-  the same model in the same session. Read these as self-consistency checks
-  on the rubric's operational clarity, not as inter-annotator reliability in
-  the normal sense.
-- One node (`nsrlg`, "Non-Shared Risk Link Group") was bound to the
-  `shared-risk-group` lexicon entry by both the gold standard and the
-  binder despite the description's literal wording being the semantic
-  *inverse* of the lexicon definition — a reminder that surface-level
-  definition matching (whether by embeddings, TF-IDF, or an LLM skimming
-  quickly) doesn't reliably catch logical negation.
+- **ISO-704 rubric labels and the gold standard itself** (as opposed to the
+  binder predictions scored against it) were authored by me in this
+  conversation; the reported κ values (0.880, 0.926) are self-consistency
+  checks on those judgments, not inter-annotator validation. Several of
+  definition-based's "errors" in §2 are cases where a rigorous reading
+  suggests my gold label, not the blind model call, was the less careful
+  judgment (see the `te-node-template` and `nsrlg` discussions in
+  `report/FINDINGS.md`).
+- **The lexicon's LEX-002/LEX-003/LEX-007 definitions overlap** ("boundary
+  point... where traffic enters or leaves") enough that even a careful blind
+  reader confuses them from prose alone; name-only mode sidesteps this
+  entirely via exact synonym-string matches that happen to exist because the
+  lexicon was authored by reading the corpus. Both of these are lexicon
+  construction issues, not evidence about the underlying question.
+- One node (`nsrlg`, "Non-Shared Risk Link Group") was correctly flagged
+  `NONE` by the real blind definition-based call, catching a shared/vs-non-shared
+  inversion between the description text and the lexicon definition that the
+  gold standard (my earlier judgment) had papered over — a good illustration
+  that not every definition-based "miss" in this run is actually a model
+  error.

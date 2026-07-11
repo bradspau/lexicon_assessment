@@ -1,0 +1,40 @@
+corpus,module,path,description
+ietf,ietf-network,/networks/network/node,The inventory of nodes of this network.
+ietf,ietf-network-topology,/networks/network/node/termination-point,"A termination point can terminate a link. Depending on the type of topology, a termination point could, for example, refer to a port or an interface."
+ietf,ietf-network-topology,/networks/network/link,"A network link connects a local (source) node and a remote (destination) node via a set of the respective node's termination points. It is possible to have several links between the same source and destination nodes. Likewise, a link could potentially be re-homed between termination points. Therefore, in order to ensure that we would always know to distinguish between links, every link is identified by a dedicated link identifier. Note that a link models a point-to-point link, not a multipoint link."
+ietf,ietf-te-topology,/networks/network/node/te/tunnel-termination-point,A termination point can terminate a tunnel.
+ietf,ietf-network-topology,/networks/network/node/termination-point/supporting-termination-point,"This list identifies any termination points on which a given termination point depends or onto which it maps. Those termination points will themselves be contained in a supporting node. This dependency information can be inferred from the dependencies between links. Therefore, this item is not separately configurable. Hence, no corresponding constraint needs to be articulated. The corresponding information is simply provided by the implementing system."
+ietf,ietf-otn-topology,/networks/network/node/termination-point/te/client-svc,OTN LTP Service attributes.
+ietf,ietf-te-topology,/networks/network/node/te/te-node-attributes/connectivity-matrices/underlay/tunnels/tunnel,"Zero, one, or more underlay TE tunnels that support this TE link."
+ietf,ietf-te-topology,/networks/network/node/te/te-node-attributes/connectivity-matrices/path-constraints,TE named path constraints container.
+ietf,ietf-te-topology,/networks/network/te/nsrlg,List of NSRLGs (Non-Shared Risk Link Groups).
+ietf,ietf-otn-topology,/networks/network/node/termination-point/te/interface-switching-capability/max-lsp-bandwidth/te-bandwidth/technology/otn-bandwidth/odu-type,ODU type.
+ietf,ietf-te-topology,/networks/network/node/termination-point/te/admin-status,The administrative state of the LTP.
+ietf,ietf-te-topology,/networks/network/node/termination-point/te/oper-status,The current operational state of the LTP.
+ietf,ietf-te-topology,/networks/network/link/te/te-link-attributes,Link attributes in a TE topology.
+ietf,ietf-te-topology,/networks/network/node/te/te-node-attributes,Contains node attributes in a TE topology.
+ietf,ietf-otn-topology,/networks/network/link/te/te-link-attributes/otn-link,Attributes of the OTN Link.
+ietf,ietf-otn-topology,/networks/network/node/te/te-node-attributes/otn-node,Introduce new TE node type for OTN node.
+ietf,ietf-network-topology,/networks/network/link/supporting-link,Identifies the link or links on which this link depends.
+ietf,ietf-te-topology,/networks/network/link/te/bundle-stack-level/bundled-links/bundled-link,Specifies a bundled interface that is further partitioned.
+ietf,ietf-te-topology,/networks/network/link/te/bundle-stack-level/component-links/component-link,Specifies a component interface that is sufficient to unambiguously identify the appropriate resources.
+ietf,ietf-te-topology,/networks/network/node/te/te-node-template,The reference to a TE node template.
+ietf,ietf-te-topology,/networks/network/link/te/te-link-template,The reference to a TE link template.
+ietf,ietf-te-topology,/networks/network/node/te/te-node-attributes/connectivity-matrices/path-constraints/path-srlgs-lists/path-srlgs-list,List of SRLG values to be included or excluded.
+tapi,tapi-topology,/context/topology-context/topology/node,The list of Nodes which the Topology encompass.
+tapi,tapi-topology,/context/topology-context/topology/node/owned-node-edge-point,"The NEPs belonging to / owned by this Node. By convention, only the Node instances at the lowest partitioning level 'own' the NEPs. In other words, each and every NEP instance is owned by a Node at the lowest partitioning level."
+tapi,tapi-topology,/context/topology-context/topology/link,The list of Links which the Topology encompass.
+tapi,tapi-connectivity,/context/connectivity-context/connectivity-service,The included ConnectivityService instances.
+tapi,tapi-connectivity,/context/connectivity-context/connectivity-service/end-point,The ConnectivityServiceEndPoint (CSEP) instances of the ConnectivityService.
+tapi,tapi-connectivity,/context/topology-context/topology/node/owned-node-edge-point/cep-list/connection-end-point,The list of supported ConnectionEndPoint (CEP) instances.
+tapi,tapi-connectivity,/context/connectivity-context/connectivity-service/connectivity-constraint,The associated connectivity constraints.
+tapi,tapi-connectivity,/context/connectivity-context/connectivity-service/routing-constraint,The associated routing constraints.
+tapi,tapi-connectivity,/context/connectivity-context/connectivity-service/topology-constraint,The associated topology constraints. Different instances of TopologyConstraints may be used to specify constraints at different layer networks.
+tapi,tapi-topology,/context/topology-context/topology/node/node-rule-group/risk-characteristic,A list of risk characteristics for consideration in an analysis of shared risk. Each element of the list represents a specific risk consideration.
+tapi,tapi-topology,/context/topology-context/topology/link/layer-protocol-name,The layer protocol(s) of the Link.
+tapi,tapi-topology,/context/topology-context/topology/node/owned-node-edge-point/layer-protocol-name,The layer protocol of the NodeEdgePoint (NEP).
+tapi,tapi-topology,/context/topology-context/topology/node/owned-node-edge-point/operational-state,The operational state gives the information about the real capability of a resource to provide or not provide service.
+tapi,tapi-topology,/context/topology-context/topology/node/owned-node-edge-point/lifecycle-state,"Used to track the planned deployment, allocation to clients and withdrawal of resources."
+tapi,tapi-common,/context/service-interface-point,The ServiceInterfacePoint (SIP) instances belonging to this context.
+tapi,tapi-topology,/context/topology-context/topology/node/node-rule-group,The Node rules applicable to this Node.
+tapi,tapi-path-computation,/context/path-computation-context/path/link,The list of Link instances composing the Path instance.
