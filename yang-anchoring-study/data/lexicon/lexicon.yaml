@@ -1,0 +1,131 @@
+# Reference lexicon for Phase 2 binding experiment.
+# ~10-15 hand-authored entries per plan §6, definitions written ISO-704 style
+# (genus + differentiating characteristic), grounded in concepts actually
+# observed in the fetched IETF/TAPI corpus (data/results/phase1_scored_nodes.csv).
+# Deliberately includes name/definition "trap" entries (LEX-002 vs LEX-003)
+# where the surface-level node name in one corpus points to the wrong entry.
+
+- id: LEX-001
+  preferred_name: forwarding-element
+  synonyms: [node, te-node, network-element]
+  entity_class: node-like
+  definition: >
+    A network element that switches or forwards traffic between its
+    termination points, considered as a single addressable unit within
+    a topology, irrespective of internal implementation.
+
+- id: LEX-002
+  preferred_name: link-termination-point
+  synonyms: [termination-point, port]
+  entity_class: termination-point-like
+  definition: >
+    A boundary point on a forwarding element where a topological link
+    attaches; the point at which traffic enters or leaves the element
+    toward a specific link.
+
+- id: LEX-003
+  preferred_name: service-anchor
+  synonyms: [tunnel-termination-point, tunnel-endpoint]
+  entity_class: service-boundary
+  definition: >
+    The head or tail point of an end-to-end service or tunnel, as
+    distinct from a physical link-attachment point; it identifies
+    where a service begins or ends, not where a link is physically
+    attached.
+
+- id: LEX-004
+  preferred_name: topological-link
+  synonyms: [link, te-link, connectivity-link]
+  entity_class: link-like
+  definition: >
+    A directed or bidirectional topological relationship between two
+    link-termination-points on (possibly different) forwarding
+    elements, representing that traffic can pass directly between
+    them without additional intermediate switching in this topology
+    view.
+
+- id: LEX-005
+  preferred_name: layer
+  synonyms: [layer-protocol, network-layer, l1-types, layer-protocol-name]
+  entity_class: abstraction-level
+  definition: >
+    A distinct technology or protocol domain (e.g. optical, OTN,
+    packet) within which nodes, links, and termination points are
+    defined; entities in one layer are related to, but not directly
+    interchangeable with, entities in another layer without an
+    explicit adaptation or stacking relationship.
+
+- id: LEX-006
+  preferred_name: service
+  synonyms: [connectivity-service, tunnel, end-to-end-service]
+  entity_class: service-boundary
+  definition: >
+    An end-to-end forwarding capability requested or provisioned
+    between two or more service-anchors, as distinct from the
+    underlying links and nodes that implement it; defined by its
+    endpoints and required characteristics (e.g. bandwidth, latency),
+    not by a specific physical path.
+
+- id: LEX-007
+  preferred_name: client-access-point
+  synonyms: [client-svc, connection-end-point, cep, csep]
+  entity_class: termination-point-like
+  definition: >
+    The point at which a client signal enters or leaves a network
+    element to be carried by a service, distinguished from a
+    link-termination-point in that it faces the client/service side
+    of an adaptation rather than the network-link side.
+
+- id: LEX-008
+  preferred_name: forwarding-constraint
+  synonyms: [routing-constraint, path-constraint, topology-constraint]
+  entity_class: constraint
+  definition: >
+    A restriction or requirement placed on how a path may be computed
+    or traffic may be forwarded (e.g. included/excluded resources,
+    metric bounds), as distinct from the resources themselves; used
+    as an input to path computation rather than as a description of
+    topology.
+
+- id: LEX-009
+  preferred_name: shared-risk-group
+  synonyms: [srlg, nsrlg, risk-characteristic, path-srlgs-list]
+  entity_class: risk-grouping
+  definition: >
+    A named set of network resources (links, nodes, or spans) that
+    share a common physical or logical risk of simultaneous failure
+    (e.g. a shared conduit or fiber), used so that path computation
+    can avoid or account for that shared fate rather than treating
+    the resources as independently reliable.
+
+- id: LEX-010
+  preferred_name: layer-1-signal-type
+  synonyms: [odu-type, signal-type, layer-protocol-qualifier, odtu-flex-type]
+  entity_class: signal-classification
+  definition: >
+    A classification of the specific digital or optical signal format
+    (e.g. an ODU container type, OTN tributary format) that a
+    termination point, link, or connection carries, distinguishing it
+    from the layer it belongs to (which identifies the technology
+    domain, not the specific signal format within that domain).
+
+- id: LEX-011
+  preferred_name: administrative-state
+  synonyms: [admin-status, is-allowed, lifecycle-state]
+  entity_class: state
+  definition: >
+    An operator-controlled setting indicating whether a resource is
+    intended to be in service, out of service, or in a transitional
+    management state, as distinct from its operational state (which
+    reflects actual observed behavior rather than administrative
+    intent).
+
+- id: LEX-012
+  preferred_name: operational-state
+  synonyms: [oper-status, operational-state]
+  entity_class: state
+  definition: >
+    A system-derived, observed indication of whether a resource is
+    actually able to carry traffic or perform its function right now,
+    as distinct from administrative-state, which reflects operator
+    intent rather than current observed capability.

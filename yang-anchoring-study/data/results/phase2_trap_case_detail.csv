@@ -1,0 +1,13 @@
+mode,corpus,path,gold_lexicon_id,relation_gold,lexicon_id,relation_pred,confidence
+name_only,ietf,/networks/network/node/te/tunnel-termination-point,LEX-003,equivalent,LEX-003,equivalent,0.85
+name_only,tapi,/context/topology-context/topology/node/owned-node-edge-point,LEX-002,equivalent,LEX-001,equivalent,0.55
+name_only,tapi,/context/topology-context/topology/node/owned-node-edge-point/cep-list/connection-end-point,LEX-007,equivalent,LEX-007,equivalent,0.9
+name_only,tapi,/context/topology-context/topology/node/owned-node-edge-point/layer-protocol-name,LEX-005,subsumed_by,LEX-005,subsumed_by,0.9
+name_only,tapi,/context/topology-context/topology/node/owned-node-edge-point/operational-state,LEX-012,equivalent,LEX-012,equivalent,0.95
+name_only,tapi,/context/topology-context/topology/node/owned-node-edge-point/lifecycle-state,LEX-011,equivalent,LEX-011,equivalent,0.9
+definition_based,ietf,/networks/network/node/te/tunnel-termination-point,LEX-003,equivalent,LEX-003,equivalent,0.9
+definition_based,tapi,/context/topology-context/topology/node/owned-node-edge-point,LEX-002,equivalent,LEX-002,equivalent,0.7
+definition_based,tapi,/context/topology-context/topology/node/owned-node-edge-point/cep-list/connection-end-point,LEX-007,equivalent,LEX-007,equivalent,0.75
+definition_based,tapi,/context/topology-context/topology/node/owned-node-edge-point/layer-protocol-name,LEX-005,subsumed_by,LEX-005,subsumed_by,0.7
+definition_based,tapi,/context/topology-context/topology/node/owned-node-edge-point/operational-state,LEX-012,equivalent,LEX-012,equivalent,0.9
+definition_based,tapi,/context/topology-context/topology/node/owned-node-edge-point/lifecycle-state,LEX-011,equivalent,LEX-011,equivalent,0.65

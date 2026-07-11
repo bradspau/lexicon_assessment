@@ -1,0 +1,16 @@
+corpus,module,path,gold_lexicon_id,relation,notes
+ietf,ietf-network,/networks/network/node,LEX-001,equivalent,
+ietf,ietf-network-topology,/networks/network/node/termination-point,LEX-002,equivalent,
+ietf,ietf-network-topology,/networks/network/link,LEX-004,equivalent,
+ietf,ietf-te-topology,/networks/network/node/te/tunnel-termination-point,LEX-003,equivalent,
+ietf,ietf-network-topology,/networks/network/node/termination-point/supporting-termination-point,LEX-002,equivalent,
+ietf,ietf-otn-topology,/networks/network/node/termination-point/te/client-svc,LEX-007,equivalent,
+ietf,ietf-te-topology,/networks/network/node/te/te-node-attributes/connectivity-matrices/underlay/tunnels/tunnel,LEX-006,equivalent,
+ietf,ietf-te-topology,/networks/network/node/te/te-node-attributes/connectivity-matrices/path-constraints,LEX-008,equivalent,
+ietf,ietf-te-topology,/networks/network/te/nsrlg,LEX-009,equivalent,
+ietf,ietf-otn-topology,/networks/network/node/termination-point/te/interface-switching-capability/max-lsp-bandwidth/te-bandwidth/technology/otn-bandwidth/odu-type,LEX-010,equivalent,
+ietf,ietf-te-topology,/networks/network/node/termination-point/te/admin-status,LEX-011,equivalent,
+ietf,ietf-te-topology,/networks/network/node/termination-point/te/oper-status,LEX-012,equivalent,
+ietf,ietf-te-topology,/networks/network/link/te/te-link-attributes,NONE,none,"Second-pass disagreement: an attribute container isn't itself a link, and 'subsumed_by' may overstate the connection; better left unbound."
+ietf,ietf-te-topology,/networks/network/node/te/te-node-attributes,LEX-001,subsumed_by,
+ietf,ietf-otn-topology,/networks/network/link/te/te-link-attributes/otn-link,LEX-004,subsumed_by,

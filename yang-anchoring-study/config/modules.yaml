@@ -1,0 +1,40 @@
+ietf:
+  - name: ietf-network
+    revision: "2018-02-26"
+    url: https://raw.githubusercontent.com/YangModels/yang/main/standard/ietf/RFC/ietf-network@2018-02-26.yang
+  - name: ietf-network-topology
+    revision: "2018-02-26"
+    url: https://raw.githubusercontent.com/YangModels/yang/main/standard/ietf/RFC/ietf-network-topology@2018-02-26.yang
+  - name: ietf-te-topology
+    revision: "2020-08-06"
+    url: https://raw.githubusercontent.com/YangModels/yang/main/standard/ietf/RFC/ietf-te-topology@2020-08-06.yang
+  - name: ietf-otn-topology
+    revision: "2024-06-21"
+    url: https://raw.githubusercontent.com/YangModels/yang/main/experimental/ietf-extracted-YANG-modules/ietf-otn-topology@2024-06-21.yang
+
+# dependency modules pyang needs on its search path to resolve imports
+# (verified against the actual `import` statements in each fetched module, not guessed)
+ietf_deps:
+  - name: ietf-yang-types
+    url: https://raw.githubusercontent.com/YangModels/yang/main/standard/ietf/RFC/ietf-yang-types@2013-07-15.yang
+  - name: ietf-inet-types
+    url: https://raw.githubusercontent.com/YangModels/yang/main/standard/ietf/RFC/ietf-inet-types@2013-07-15.yang
+  - name: ietf-te-types
+    url: https://raw.githubusercontent.com/YangModels/yang/main/standard/ietf/RFC/ietf-te-types@2020-06-10.yang
+  - name: ietf-routing-types
+    url: https://raw.githubusercontent.com/YangModels/yang/main/standard/ietf/RFC/ietf-routing-types@2017-12-04.yang
+  - name: ietf-layer1-types
+    url: https://raw.githubusercontent.com/YangModels/yang/main/experimental/ietf-extracted-YANG-modules/ietf-layer1-types@2024-02-22.yang
+
+tapi:
+  tag: v2.5.2
+  base: https://raw.githubusercontent.com/OpenNetworkingFoundation/TAPI/v2.5.2/YANG
+  modules:
+    - tapi-topology.yang
+    - tapi-connectivity.yang
+    - tapi-common.yang
+  # transitive deps of the modules above, also verified against actual imports
+  deps:
+    - tapi-notification.yang
+    - tapi-streaming.yang
+    - tapi-path-computation.yang

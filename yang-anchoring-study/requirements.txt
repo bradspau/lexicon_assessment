@@ -1,0 +1,7 @@
+pyang==2.7.1
+pyyaml
+requests
+pandas
+scikit-learn
+sentence-transformers   # optional, for collision analysis; fallback = TF-IDF if unavailable
+anthropic               # for the LLM binder (step 8)
