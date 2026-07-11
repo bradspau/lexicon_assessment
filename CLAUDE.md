@@ -4,35 +4,35 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project status
 
-This repository currently contains only a plan document, `CLAUDE_PLAN_yang_anchoring_study.md`. No project dependencies or `requirements.txt` exist yet, and none of the scaffold described below has been created yet. There is no git repo initialized.
+The study is built and executed. `yang-anchoring-study/` contains the full pipeline (`scripts/`), fetched corpus (`corpus/`), all intermediate and final data (`data/`), and the write-up (`report/FINDINGS.md`). Git is initialized and pushed to `github.com/bradspau/lexicon_assessment` (remote `origin`, branch `main`).
 
-When asked to build or continue this project, treat `CLAUDE_PLAN_yang_anchoring_study.md` as the spec and execute it step by step rather than re-deriving the design.
+`CLAUDE_PLAN_yang_anchoring_study.md` is still the original spec — useful for understanding *why* a script exists — but it does not reflect what actually happened. For that, read **`yang-anchoring-study/README.md`** first: it documents what's a straight reproducible measurement (Phase 1) versus what required LLM judgment and how blind that judgment actually was (Phase 2), which numbers can be cited and which can't. `yang-anchoring-study/report/FINDINGS.md` has the full results and discussion.
+
+If asked to extend or re-run part of this study, don't re-derive the pipeline from the plan — read the existing scripts and README first; the deviations from the plan (below) were deliberate and re-implementing from the plan text alone will reintroduce bugs that are already fixed.
 
 ## What this project is
 
 An empirical study testing whether YANG `description` statements in network-management data models (IETF topology/TE modules vs. ONF TAPI modules) support LLM-based "definitional anchoring" — i.e., whether an LLM can correctly bind a data-model node to the right entry in a hand-built reference lexicon using its `description` text, versus using only the node's name. The output is a precision/recall/F1 comparison (name-only vs. definition-based binding) scored against a manually curated gold standard, plus a Phase 1 quality/collision audit of the descriptions themselves.
 
-Full methodology, scripts, and exact commands live in `CLAUDE_PLAN_yang_anchoring_study.md` — read it in full before starting work. Key structure:
+- **Phase 1:** fetch YANG corpus (IETF + TAPI modules, pinned by revision in `config/modules.yaml`) → extract `(module, path, node-type, description)` tuples → quality audit (coverage, boilerplate %, name-restatement %, ISO-704 definitional rubric) → semantic-collision analysis (TF-IDF cosine similarity between same-corpus descriptions) → `report/FINDINGS.md` §1.
+- **Phase 2:** hand-authored reference lexicon (`data/lexicon/lexicon.yaml`, 12 entries) → hand-authored gold standard (`data/gold/gold_standard.csv`, 39 rows) → LLM binder in `name_only` vs `definition_based` prompt modes → precision/recall/F1 against gold, with a trap-case-specific breakdown.
+- Result, real and blind (see "Working conventions" below): name-only F1=0.98, definition-based F1=0.84 — the opposite of the naive hypothesis, and not the whole story. Read `report/FINDINGS.md` §2–3 before citing either number; most of definition-based's errors trace to overlapping lexicon definitions or genuinely tautological source descriptions, not a binder failure.
 
-- **Phase 1 (steps 1–5):** fetch YANG corpus (IETF + TAPI modules, pinned by revision in `config/modules.yaml`) → extract `(module, path, node-type, description)` tuples via `pyang -f flatten` (with a fallback custom pyang plugin if the flatten flags aren't available) → quality audit (coverage, boilerplate %, name-restatement %, ISO-704 definitional rubric) → semantic-collision analysis (embedding/TF-IDF cosine similarity between same-corpus descriptions) → assemble `report/FINDINGS.md` §1.
-- **Phase 2 (steps 6–11):** hand-author a reference lexicon (`data/lexicon/lexicon.yaml`, ~10–15 entries, deliberately including name/definition "trap cases" like `tunnel-termination-point` vs `link-termination-point`) → build a manually-labeled gold standard (`data/gold/gold_standard.csv`) → run an LLM binder (`anthropic` SDK) in `name_only` vs `definition_based` prompt modes → score against gold with precision/recall/F1, including a trap-case-specific breakdown.
-- **Step 12:** final write-up in `report/FINDINGS.md`, interpreted against the sanity thresholds in plan §10.
+## Working conventions from the plan and its execution
 
-## Working conventions from the plan
-
-- Every numbered step in the plan has an explicit script name (`scripts/01_fetch_corpus.py` … `09_score_binding.py`) and a concrete output artifact under `data/` or `report/` — follow that naming when creating scripts so outputs stay traceable to the step that produced them.
-- Steps 7 (gold standard) and part of step 3 (ISO-704 rubric labels) are explicitly manual/expert-judgment steps — only script the scaffolding (candidate filtering, CSV templates, Cohen's κ agreement calc), not the labeling itself.
-- pyang needs `-p corpus/ietf:corpus/tapi` on its path even when only extracting descriptions, to resolve imports (`ietf-yang-types`, `ietf-inet-types`, `ietf-te-types`, TAPI's own transitive imports) — otherwise `-f flatten` emits import-resolution warnings. Fetch dependency modules into the corpus dirs, not just the top-level modules listed in `config/modules.yaml`.
-- Before trusting `pyang -f flatten --flatten-description`, run `pyang -f flatten --help` once to confirm the installed pyang version's flag names match the plan (drift here is expected across pyang versions).
-- The OTN topology draft module has no stable URL yet (see plan §1.2) — resolving it is a one-time manual step (GitHub contents API lookup, or Datatracker HTML extraction as fallback since Datatracker may not be in the sandbox's allowlisted network config).
-- When running the LLM binder (step 8), the model string in the plan (`claude-sonnet-5`) may need updating to whatever model the environment actually exposes.
-- Validate the LLM as an ISO-704 rubric annotator (step 3) by computing Cohen's κ between LLM labels and a 30-node manually-labeled subset before trusting LLM labels on the full sample.
+- Every numbered step in the plan has an explicit script name (`scripts/01_fetch_corpus.py` … `09_score_binding.py`) and a concrete output artifact under `data/` or `report/` — follow that naming when adding scripts so outputs stay traceable to the step that produced them.
+- `scripts/07_build_gold_standard.py` only regenerates the candidate pool and the second-annotator κ check. The gold standard itself, plus the ISO-704 rubric labels, are **hand-authored data**, not script output: `scripts/_gold_standard_data.py`, `scripts/_iso704_labels.py`, `scripts/_phase2_bindings_data.py` are `_`-prefixed for exactly this reason — read them as recorded judgments to audit, not pipeline logic to blindly trust or "fix."
+- **Extraction deviates from the plan's primary approach.** `scripts/02_extract_descriptions.py` uses the pyang Python API directly instead of the CLI `-f flatten --flatten-description`, because the CLI plugin can't resolve cross-file augments (IETF's TE/OTN topology modules augment the base `ietf-network`/`ietf-network-topology` tree) when modules are passed one file at a time, and gives no way to attribute an augmented node to its true owning module. It uses `i_module.arg` per-statement for correct ownership — verify against a live augmented node before trusting any change here.
+- pyang needs `-p corpus/ietf:corpus/tapi` on its path even when only extracting descriptions, to resolve imports. Dependency modules (`ietf-yang-types`, `ietf-inet-types`, `ietf-te-types`, TAPI's transitive imports) live in the corpus dirs alongside the top-level modules for this reason — don't remove them thinking they're unused.
+- The OTN topology draft module has no stable pinned URL — it was resolved via a one-time GitHub contents API lookup (see `config/modules.yaml` comments); re-resolve if the corpus needs refreshing.
+- **No `ANTHROPIC_API_KEY` is available in this environment.** For Phase 2's LLM binder, this doesn't mean falling back to hand-simulated judgments — that was tried once, found to be contaminated (gold-standard author == the "blind" judge, same conversation), and replaced. The current approach: spawn one isolated `Agent`-tool subagent per binding decision (78 total: 39 candidates × 2 modes), each with no filesystem access and no visibility into this conversation or `data/gold/gold_standard.csv`, given only the literal prompt text. This is a genuinely blind evaluation without needing an API key — reuse this pattern for any future LLM-judgment step in this repo rather than reasoning through prompts by hand.
+- **Known fixed bug:** `scripts/08_llm_binder.py` used to merge the *entire* gold-standard frame (including gold's own `relation` column) against predictions. Pandas' `suffixes=("", "_pred")` let gold's `relation` silently shadow the predicted one in the output CSV — didn't affect scoring (which only compares `lexicon_id`) but corrupted the `relation` metadata. Fixed by merging only `[corpus, module, path]` from gold as filter keys. If you touch this script, keep predictions and gold-standard columns from ever having the same name pre-merge.
+- Cohen's κ values reported in `FINDINGS.md` (0.880, 0.926) are **self-consistency checks**, not inter-annotator validation — both passes being compared were authored by the same agent in the same session. Only the 78 Phase 2 binder predictions are genuinely independent of the gold standard.
 
 ## Setup
 
-No `requirements.txt` exists yet — create it per plan §"requirements.txt" (`pyang==2.7.1`, `pyyaml`, `requests`, `pandas`, `scikit-learn`, `sentence-transformers` optional, `anthropic`). Install into a local venv (e.g. `.venv`, Python 3.10):
-
 ```bash
-python3 -m venv .venv
-.venv/bin/pip install -r requirements.txt
+python3 -m venv .venv && .venv/bin/pip install -r yang-anchoring-study/requirements.txt
 ```
+
+Then see `yang-anchoring-study/README.md` → "Running it" for the pipeline commands (run from within `yang-anchoring-study/`, venv referenced as `../.venv`).
