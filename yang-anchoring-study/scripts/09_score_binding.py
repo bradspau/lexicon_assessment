@@ -1,5 +1,4 @@
 import pandas as pd
-from sklearn.metrics import precision_recall_fscore_support
 
 pred = pd.read_csv("data/results/phase2_bindings_raw.csv")
 gold = pd.read_csv("data/gold/gold_standard.csv")
@@ -8,16 +7,41 @@ merged = pred.merge(gold, on=["corpus", "module", "path"], suffixes=("_pred", "_
 
 
 def score(df, relation_filter=None, exclude_trivial_name_match=False):
+    """
+    Detection + classification scoring (standard for tasks like NER/relation
+    extraction, not the degenerate sklearn-on-all-1s trick this replaces --
+    see report/FINDINGS.md's "how to read this table" note for why the old
+    version made precision mathematically pinned at 1.0 regardless of binder
+    quality).
+
+    A gold row's "NONE" case is always included in every scope, since
+    correctly abstaining is relevant no matter how leniently we're counting
+    subsumption -- it's the only source of a genuine false positive in this
+    dataset (a real error where the binder asserts a match that doesn't
+    exist), without it precision can never differ from 1.0 by construction.
+
+    Per row: TP = binder asserted the exact correct lexicon_id (gold isn't
+    NONE). FP = binder asserted *some* real lexicon_id but it's wrong
+    (whether gold wanted a different id or no match at all). FN = binder
+    said NONE but gold wanted a real match. TN = binder said NONE and gold
+    is NONE (contributes to neither precision nor recall, same as always).
+    """
     d = df.copy()
     if relation_filter:
-        d = d[d["relation_gold"].isin(relation_filter)]
+        d = d[d["relation_gold"].isin(relation_filter) | (d["gold_lexicon_id"] == "NONE")]
     if exclude_trivial_name_match:
         d = d[~d.apply(lambda r: r["path"].split("/")[-1].replace("-", "") in str(r.get("lexicon_id", "")).lower(), axis=1)]
-    y_true = (d["gold_lexicon_id"] == d["lexicon_id"]).astype(int)
-    p, r, f1, _ = precision_recall_fscore_support(
-        [1] * len(d), y_true, average="binary", zero_division=0
-    )
-    return {"n": len(d), "precision": p, "recall": r, "f1": f1}
+
+    is_none_gold = d["gold_lexicon_id"] == "NONE"
+    is_none_pred = d["lexicon_id"] == "NONE"
+    tp = ((~is_none_gold) & (d["lexicon_id"] == d["gold_lexicon_id"])).sum()
+    fp = ((~is_none_pred) & (d["lexicon_id"] != d["gold_lexicon_id"])).sum()
+    fn = (is_none_pred & (~is_none_gold)).sum()
+
+    precision = tp / (tp + fp) if (tp + fp) > 0 else 0.0
+    recall = tp / (tp + fn) if (tp + fn) > 0 else 0.0
+    f1 = 2 * precision * recall / (precision + recall) if (precision + recall) > 0 else 0.0
+    return {"n": len(d), "precision": precision, "recall": recall, "f1": f1}
 
 
 rows = []

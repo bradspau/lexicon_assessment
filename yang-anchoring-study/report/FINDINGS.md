@@ -65,24 +65,26 @@ An earlier pass through this study (superseded, see git history) had the same ag
 
 (The gold standard itself and its second-annotator κ = 0.926 were still produced by me in-conversation, same as the ISO-704 rubric labels in §1 — that limitation stands. What changed is the *binder*, which is now independent of both.)
 
-### Results (`phase2_scores.csv`) — the headline is inverted from the naive hypothesis
+### Results (`phase2_scores.csv`), the headline is inverted from the naive hypothesis
 
 | mode | scope | n | precision | recall | F1 |
 |---|---|---|---|---|---|
-| name_only | equivalence_only | 25 | 1.0 | 0.960 | 0.980 |
-| name_only | equivalence_plus_subsumption | 38 | 1.0 | 0.974 | 0.987 |
-| name_only | recall_plus_nontrivial | 25 | 1.0 | 0.960 | 0.980 |
-| definition_based | equivalence_only | 25 | 1.0 | 0.720 | 0.837 |
-| definition_based | equivalence_plus_subsumption | 38 | 1.0 | 0.711 | 0.831 |
-| definition_based | recall_plus_nontrivial | 25 | 1.0 | 0.720 | 0.837 |
+| name_only | equivalence_only | 26 | 0.960 | 1.000 | 0.980 |
+| name_only | equivalence_plus_subsumption | 39 | 0.974 | 1.000 | 0.987 |
+| name_only | recall_plus_nontrivial | 26 | 0.960 | 1.000 | 0.980 |
+| definition_based | equivalence_only | 26 | 0.818 | 0.857 | 0.837 |
+| definition_based | equivalence_plus_subsumption | 39 | 0.871 | 0.794 | 0.831 |
+| definition_based | recall_plus_nontrivial | 26 | 0.818 | 0.857 | 0.837 |
 
-**How to read this table — the "precision" column is a degenerate artifact, not a real measurement.** `scripts/09_score_binding.py` computes these via `sklearn.metrics.precision_recall_fscore_support`, but feeds it `y_true = [1] * len(d)` (an array of all-1s standing in for "this gold row should get *some* match") against `y_pred = (gold_lexicon_id == lexicon_id)` (1 if the binder's answer matches gold, 0 if not). Because the "true" label is fixed at 1 for every row, there is no row where a false positive is even possible (precision = TP/(TP+FP), and FP is structurally always 0) — so **precision is mathematically guaranteed to equal 1.0 regardless of how good or bad the binder actually is.** It isn't measuring the model here; it's an artifact of how the arrays were constructed, inherited from the plan's original `09_score_binding.py` design (plan §9) and carried through unmodified.
+**How to read this table.** An earlier version of `scripts/09_score_binding.py` computed precision using a degenerate sklearn trick that pinned it at 1.0 regardless of binder quality, see git history for the superseded note that explained that bug. The script has since been fixed to compute proper detection-plus-classification precision and recall, the standard approach for tasks like named-entity recognition, where a system both has to notice something exists and get its label right.
 
-**Recall is what's actually doing the work**, and in this construction it reduces to plain accuracy: (# rows where the binder's `lexicon_id` matches gold) / (# rows in scope). E.g. `definition_based`/`equivalence_only`: 18 correct out of 25 gold rows = 0.720. `NONE` predictions are *not* excluded from this count — a `NONE` answer against a gold row that expects a real lexicon match is scored as simply wrong, same as any other mismatch.
+Per row, against gold: TP (true positive) is the binder asserting the exact correct lexicon entry. FP (false positive) is the binder confidently asserting a real lexicon entry that is wrong, whether gold wanted a different entry or no match at all. FN (false negative) is the binder answering `NONE` when gold wanted a real match. The one gold row that genuinely should get `NONE` (`/context/topology-context/topology/node/node-rule-group`) is now included in every scope, since correctly abstaining matters no matter how leniently subsumption is counted. Both modes got it right, so it contributes a true negative and does not move precision or recall either way, it just adds 1 to `n`.
 
-**F1 in this table is therefore just a fixed transform of recall alone**, since precision is pinned at 1: `F1 = 2 × (1 × recall) / (1 + recall) = 2×recall / (1+recall)`. It adds no new information beyond recall/accuracy — it's carried in the table only because the plan's original scoring script computes it, not because it's telling you something precision and recall don't already say separately. When reading this table (or `phase2_scores.csv` directly), **look at the recall column; treat precision and F1 as along for the ride.**
+- **Precision** = TP / (TP + FP): of all the times the binder confidently asserted a specific lexicon entry, how often that entry was actually correct. `name_only` sits at 0.96, it made exactly one wrong, confident guess (the `owned-node-edge-point` trap). `definition_based` sits at 0.818 to 0.871 depending on scope, reflecting 4 wrong, confident guesses across the run.
+- **Recall** = TP / (TP + FN): of all the gold rows that genuinely needed a real match, how often the binder found it, whether by a confident guess or not. `name_only` hits 1.000 in every scope, it never inappropriately abstained. `definition_based` sits at 0.79 to 0.86, reflecting 7 cases where it answered `NONE` on a row gold expected a real match.
+- **F1** is the harmonic mean of the two. Its value is unchanged from the earlier, buggy version of this table, which turns out to be a mathematical coincidence rather than a mistake: F1 reduces algebraically to `2×TP / (2×TP + FP + FN)`, a quantity that does not depend on how "wrong" gets split between FP and FN. So F1 was already correct even while precision and recall, individually, were not.
 
-Across all 39 candidates, **name-only made 1 error; definition-based made 11.** This is the opposite of both the plan's hypothesis and the earlier (contaminated) hand-run's result. It would be a mistake to read this as "descriptions actively hurt binding" without understanding *why* — the error pattern (`data/results/phase2_bindings_raw.csv`, diffed against gold) tells a more specific story than that.
+Across all 39 candidates, **name-only made 1 error, definition-based made 11**, split as 1 FP and 0 FN for name-only versus 4 FP and 7 FN for definition-based. This is the opposite of both the plan's hypothesis and the earlier, contaminated hand-run's result. It would be a mistake to read this as "descriptions actively hurt binding" without understanding why, the error pattern (`data/results/phase2_bindings_raw.csv`, diffed against gold) tells a more specific story than that.
 
 ### Why definition-based lost: two distinct, genuine causes
 
