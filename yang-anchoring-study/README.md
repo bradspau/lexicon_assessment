@@ -38,9 +38,9 @@ same numbers. No model judgment is involved except in the ISO-704 rubric
 sample (below).
 
 **Phase 2 (lexicon → gold standard → LLM binder → scoring) required an LLM
-to make ~150 individual judgment calls**, plus 116 name-only/definition-based
-binder predictions (58 gold-standard candidates × 2 modes, grown from an
-initial 39). No `ANTHROPIC_API_KEY` was available in this environment, so
+to make ~150 individual judgment calls**, plus 144 name-only/definition-based
+binder predictions (72 gold-standard candidates × 2 modes, grown from an
+initial 39 via two expansion rounds). No `ANTHROPIC_API_KEY` was available in this environment, so
 these were not raw `anthropic` SDK calls, but the binder predictions **were**
 produced independently: each candidate × mode was sent to a *separate,
 freshly-spawned subagent* (via the coding harness's `Agent` tool) with no
