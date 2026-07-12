@@ -87,6 +87,27 @@ NAME_ONLY = [
     ("tapi", "tapi-common", "/context/service-interface-point", "LEX-007", "equivalent", 0.62),
     ("tapi", "tapi-topology", "/context/topology-context/topology/node/node-rule-group", "NONE", "none", 0.85),
     ("tapi", "tapi-path-computation", "/context/path-computation-context/path/link", "LEX-004", "equivalent", 0.95),
+
+    # --- GOLD-STANDARD EXPANSION (19 more candidates, same blind isolated-subagent methodology) ---
+    ("tapi", "tapi-topology", "/context/topology-context/topology/node/owned-node-edge-point/administrative-state", "LEX-011", "equivalent", 0.95),
+    ("ietf", "ietf-otn-topology", "/networks/network/link/te/te-link-attributes/otn-link/odtu-flex-type", "LEX-010", "equivalent", 0.85),
+    ("ietf", "ietf-te-topology", "/networks/network/node/te/te-node-attributes/connectivity-matrices/underlay/tunnels", "LEX-006", "subsumed_by", 0.55),
+    ("tapi", "tapi-connectivity", "/context/topology-context/topology/node/owned-node-edge-point/cep-list", "LEX-007", "subsumed_by", 0.75),
+    ("ietf", "ietf-te-topology", "/networks/network/node/te/tunnel-termination-point/local-link-connectivities", "LEX-003", "subsumed_by", 0.6),
+    ("ietf", "ietf-te-topology", "/networks/network/node/te/tunnel-termination-point/client-layer-adaptation", "LEX-005", "subsumed_by", 0.55),
+    ("tapi", "tapi-common", "/context/service-interface-point/available-capacity", "LEX-007", "subsumed_by", 0.7),
+    ("ietf", "ietf-network-topology", "/networks/network/link/source/source-tp", "LEX-002", "equivalent", 0.85),
+    ("ietf", "ietf-network-topology", "/networks/network/link/source", "LEX-002", "subsumed_by", 0.7),
+    ("ietf", "ietf-network-topology", "/networks/network/link/link-id", "LEX-004", "subsumed_by", 0.75),
+    ("tapi", "tapi-path-computation", "/context/path-computation-context/path-comp-service", "LEX-006", "equivalent", 0.6),
+    ("tapi", "tapi-path-computation", "/context/path-computation-context/path-comp-service/end-point", "LEX-007", "equivalent", 0.6),
+    ("tapi", "tapi-path-computation", "/context/path-computation-context/path-comp-service/routing-constraint", "LEX-008", "equivalent", 0.9),
+    ("tapi", "tapi-path-computation", "/context/path-computation-context/path", "NONE", "none", 0.65),
+    ("tapi", "tapi-connectivity", "/context/connectivity-context/connectivity-service/connection", "LEX-006", "subsumed_by", 0.55),
+    ("tapi", "tapi-connectivity", "/context/connectivity-context/connectivity-service/routing-constraint/risk-diversity-characteristic", "LEX-009", "equivalent", 0.72),
+    ("ietf", "ietf-network", "/networks/network/supporting-network", "NONE", "none", 0.85),
+    ("ietf", "ietf-network", "/networks/network/node/supporting-node", "LEX-001", "subsumed_by", 0.6),
+    ("tapi", "tapi-common", "/context/service-interface-point/layer-protocol-name", "LEX-005", "equivalent", 0.85),
 ]
 
 DEFINITION_BASED = [
@@ -135,7 +156,35 @@ DEFINITION_BASED = [
     ("tapi", "tapi-common", "/context/service-interface-point", "LEX-007", "subsumed_by", 0.75),  # RETEST
     ("tapi", "tapi-topology", "/context/topology-context/topology/node/node-rule-group", "NONE", "none", 0.95),
     ("tapi", "tapi-path-computation", "/context/path-computation-context/path/link", "LEX-004", "equivalent", 0.75),
+
+    # --- GOLD-STANDARD EXPANSION (19 more candidates, same blind isolated-subagent methodology) ---
+    ("tapi", "tapi-topology", "/context/topology-context/topology/node/owned-node-edge-point/administrative-state", "LEX-011", "equivalent", 0.95),
+    ("ietf", "ietf-otn-topology", "/networks/network/link/te/te-link-attributes/otn-link/odtu-flex-type", "LEX-010", "subsumed_by", 0.72),
+    # confused with LEX-003 by literal "TE tunnel" text overlap in LEX-003's own definition; a real
+    # definition-based error -- LEX-006's definition doesn't say "tunnel" (only its synonym list does), so
+    # this container of tunnel/service instances got pulled toward the tunnel-endpoint concept instead
+    ("ietf", "ietf-te-topology", "/networks/network/node/te/te-node-attributes/connectivity-matrices/underlay/tunnels", "LEX-003", "subsumed_by", 0.55),
+    ("tapi", "tapi-connectivity", "/context/topology-context/topology/node/owned-node-edge-point/cep-list", "NONE", "none", 0.75),
+    ("ietf", "ietf-te-topology", "/networks/network/node/te/tunnel-termination-point/local-link-connectivities", "LEX-003", "subsumed_by", 0.55),
+    ("ietf", "ietf-te-topology", "/networks/network/node/te/tunnel-termination-point/client-layer-adaptation", "LEX-003", "subsumed_by", 0.55),
+    ("tapi", "tapi-common", "/context/service-interface-point/available-capacity", "LEX-007", "subsumed_by", 0.62),
+    ("ietf", "ietf-network-topology", "/networks/network/link/source/source-tp", "LEX-002", "equivalent", 0.85),
+    ("ietf", "ietf-network-topology", "/networks/network/link/source", "LEX-002", "subsumed_by", 0.7),
+    ("ietf", "ietf-network-topology", "/networks/network/link/link-id", "LEX-004", "subsumed_by", 0.75),
+    ("tapi", "tapi-path-computation", "/context/path-computation-context/path-comp-service", "LEX-006", "subsumed_by", 0.55),
+    # confused with LEX-003 by "path computation" appearing in both LEX-003's definition and this
+    # module's own naming; a real construct-validity gap between LEX-003's wording and tapi-path-computation
+    ("tapi", "tapi-path-computation", "/context/path-computation-context/path-comp-service/end-point", "LEX-003", "equivalent", 0.62),
+    ("tapi", "tapi-path-computation", "/context/path-computation-context/path-comp-service/routing-constraint", "LEX-008", "equivalent", 0.75),
+    ("tapi", "tapi-path-computation", "/context/path-computation-context/path", "NONE", "none", 0.65),
+    ("tapi", "tapi-connectivity", "/context/connectivity-context/connectivity-service/connection", "LEX-006", "subsumed_by", 0.55),
+    ("tapi", "tapi-connectivity", "/context/connectivity-context/connectivity-service/routing-constraint/risk-diversity-characteristic", "LEX-009", "subsumed_by", 0.55),
+    ("ietf", "ietf-network", "/networks/network/supporting-network", "LEX-005", "none", 0.55),
+    ("ietf", "ietf-network", "/networks/network/node/supporting-node", "LEX-001", "subsumed_by", 0.55),
+    # path context (under service-interface-point) outweighed the description's own "layer protocol"
+    # content; a real definition-based error, mirrors the client-svc/available-capacity pattern in reverse
+    ("tapi", "tapi-common", "/context/service-interface-point/layer-protocol-name", "LEX-007", "subsumed_by", 0.6),
 ]
 
-assert len(NAME_ONLY) == 39, len(NAME_ONLY)
-assert len(DEFINITION_BASED) == 39, len(DEFINITION_BASED)
+assert len(NAME_ONLY) == 58, len(NAME_ONLY)
+assert len(DEFINITION_BASED) == 58, len(DEFINITION_BASED)
