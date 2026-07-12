@@ -81,12 +81,14 @@ The 8 candidate rows affected by fixes 2 and 3 were re-sent to 8 fresh, independ
 
 | mode | scope | n | precision | recall | F1 |
 |---|---|---|---|---|---|
-| name_only | equivalence_only | 26 | 0.880 | 0.957 | 0.917 |
+| name_only | equivalence_only | 25 | 0.875 | 0.955 | 0.913 |
 | name_only | equivalence_plus_subsumption | 39 | 0.921 | 0.972 | 0.946 |
-| name_only | recall_plus_nontrivial | 26 | 0.880 | 0.957 | 0.917 |
-| definition_based | equivalence_only | 26 | 0.955 | 0.913 | 0.933 |
+| name_only | recall_plus_nontrivial | 25 | 0.875 | 0.955 | 0.913 |
+| definition_based | equivalence_only | 25 | 0.952 | 0.909 | 0.930 |
 | definition_based | equivalence_plus_subsumption | 39 | 0.971 | 0.944 | 0.958 |
-| definition_based | recall_plus_nontrivial | 26 | 0.955 | 0.913 | 0.933 |
+| definition_based | recall_plus_nontrivial | 25 | 0.952 | 0.909 | 0.930 |
+
+(`equivalence_only`/`recall_plus_nontrivial` scope dropped from n=26 to n=25 after the symmetric re-audit below softened `client-svc`'s gold relation from `equivalent` to `subsumed_by`, moving it out of those two scopes' filter; `equivalence_plus_subsumption`, the scope this report's headline numbers cite, is unaffected, since it already includes `subsumed_by` rows and scores on `lexicon_id` alone.)
 
 **How to read this table.** `scripts/09_score_binding.py` computes proper detection-plus-classification precision and recall, the standard approach for tasks like named-entity recognition, where a system both has to notice something exists and get its label right. A wrong non-`NONE` guess is double-counted as both a false positive (a wrong answer was confidently asserted) and a false negative (the correct answer was missed), the standard NER/IE convention, rather than only counting against precision.
 
@@ -94,11 +96,23 @@ Per row, against gold: TP is the binder asserting the exact correct lexicon entr
 
 On the full 39-row set: **name-only made 3 errors (TP 35, FP 3, FN 1, TN 1); definition-based made 2 (TP 34, FP 1, FN 2, TN 3).** Definition-based now edges out name-only on F1 (0.958 vs. 0.946), a genuine but narrow result, not a landslide, and it only emerges after fixing two errors in *our own* gold standard and one construct-validity problem in *our own* lexicon. This is the opposite of the first run's inverted headline, but it should be read as "the study's instruments needed calibrating," not as "the model got better."
 
+### Symmetric re-audit of the 37 rows where definition-based already agreed with gold
+
+The correction round above had a real selection-effect caveat: it only re-investigated rows where the binder disagreed with gold, which risks confirmation bias, finding gold wrong exactly where it's convenient to and never checking the rows that "worked." This audit closes that gap. All 37 rows where the corrected definition-based binder's `lexicon_id` matches `gold_lexicon_id` were individually checked against the actual RFC/TAPI-derived YANG source text (not just the extracted description) and against the relevant lexicon definition, looking for genus/differentia mismatches, wrong relation labels, or agreement that only holds by coincidence.
+
+**Result: no `lexicon_id` in the gold standard needed to change.** The internal conventions this gold standard already uses turned out to be more consistent than a spot check would suggest: list/container-of-instances nodes (`node`, `link`, `connectivity-service`) are consistently `equivalent` to the singular concept; attribute-bag containers (`te-node-attributes`, `otn-node`, `otn-link`, `layer-protocol-name`) are consistently `subsumed_by`; base-type-vs-specific-subtype pairs (`connectivity-constraint` vs. `routing-constraint`/`topology-constraint`) are correctly `equivalent`-vs-`subsumed_by`; and `path-srlgs-list`'s `subsumes` (a *list* of many named SRLGs, confirmed via the source YANG as a `list`, not a `container`) is correctly distinguished from `path-constraints`' `equivalent` (confirmed as a singular `container` of one named constraint's attributes, not a list of many).
+
+Two smaller things did surface, addressed above and below respectively: the `supporting-termination-point` reframing, and `client-svc`'s gold relation, softened from `equivalent` to `subsumed_by` for consistency with the attribute-bag convention used elsewhere (its description, "OTN LTP Service attributes", is the same "attributes of X" pattern as `te-link-attributes`). This only touches the `relation` column, not `lexicon_id`, so it doesn't change which predictions score as correct, it only moves `client-svc` out of the `equivalence_only`/`recall_plus_nontrivial` scopes (n 26→25 there; the `equivalence_plus_subsumption` scope this report's headline cites is unaffected).
+
+**A genuine limitation surfaced, not a gold error but worth naming:** 3 of the 37 rows (`odu-type`: "ODU type"; `admin-status`: "The administrative state of the LTP"; `oper-status`: "The current operational state of the LTP") have source descriptions that are near-total restatements of the node's own name, confirmed against the raw YANG source, not an extraction artifact. The concept match in gold is still correct, "ODU type" genuinely is a layer-1-signal-type, but these three rows carry almost no definitional content beyond echoing the name, so their correct binding demonstrates name-recognition more than genuine definitional anchoring. This is a small-scale instance of the same pattern §1 found at corpus scale (IETF ~49% tautological), and a reminder that "definition-based got N/39 right" already has a few free points baked in from descriptions that are barely more than names.
+
 ### What the remaining errors show
 
 **Name-only's 3 remaining errors are now genuinely informative, not just curation noise.** All three are cases where a literal name/synonym match actively misleads: `nsrlg` matches the `LEX-009` synonym list verbatim but means the semantic opposite of shared-risk-group; `lifecycle-state` matches the `LEX-011` synonym list verbatim but names a different (provisioning-lifecycle) concept than administrative-state; `owned-node-edge-point` has no lexical overlap with LEX-002's synonyms at all and gets pulled toward LEX-007 by a different surface cue. In all three, definition-based mode (or gold, once corrected) got the semantics right precisely because it wasn't relying on string matching. That is a small but clean piece of positive evidence for the study's original thesis: name-only's genuine failure mode is trusting a name/synonym match that turns out to be a false friend.
 
-**Definition-based's 2 remaining errors are genuinely not correctable within this study.** Both trace to source descriptions that are silent on the exact fact needed to disambiguate, `cep-list/connection-end-point`'s four-word description never says client-facing vs. network-facing; `supporting-termination-point`'s description explains a dependency relationship, not an identity. No lexicon rewrite or prompt change can supply information the YANG description itself doesn't contain, this is the clearest evidence in the whole study that *some* binding failures are a genuine property of the source text's semantic content, not of the binder or the reference lexicon.
+**Definition-based's 2 remaining errors, revisited after a symmetric re-audit of the 37 rows where it already agreed with gold.** `cep-list/connection-end-point`'s four-word description ("The list of supported ConnectionEndPoint (CEP) instances") genuinely never says client-facing vs. network-facing, no lexicon rewrite or prompt change can supply that missing fact, this one is still a real, uncorrectable limit of the source text.
+
+`supporting-termination-point` is a weaker case than that framing suggests, though. Its description ("identifies any termination points on which a given termination point depends") is structurally identical to `supporting-link`'s ("identifies the link or links on which this link depends"), the same RFC 8345 underlay-dependency pattern, and `supporting-link` is one of the 37 rows the binder bound correctly (to LEX-004, matching gold). If a dependency-relationship description were structurally insufficient to carry identity, both should fail the same way, they don't. So `supporting-termination-point`'s `NONE` answer looks more like binder under-confidence on a terse, relationally-phrased description than proof the text lacks the needed signal. Read as 1 genuinely uncorrectable error (`cep-list/connection-end-point`) and 1 case of excess model caution (`supporting-termination-point`), not 2 of the same kind.
 
 ### Trap-case detail (`phase2_trap_case_detail.csv`), the mechanism still holds, just not in aggregate
 

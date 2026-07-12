@@ -129,8 +129,13 @@ still resolves exactly as the plan predicts: mis-bound to
   concept. Both are now corrected to `NONE` in `data/gold/gold_standard.csv`
   (see its notes column). The reported second-annotator κ = 0.926 predates
   this correction and is a self-consistency check, not inter-annotator
-  validation, and this correction methodology only re-examined rows the
-  binder disagreed with gold on, not a symmetric re-audit of every row.
+  validation. A follow-up symmetric re-audit of all 37 rows where the binder
+  already agreed with gold found no further `lexicon_id` errors, one relation
+  label softened (`client-svc`, `equivalent` → `subsumed_by`, no scoring
+  impact), and 3 rows (`odu-type`, `admin-status`, `oper-status`) whose source
+  descriptions are near-total name restatements, correctly bound but barely
+  testing definitional anchoring at all. See `report/FINDINGS.md` §2's
+  "Symmetric re-audit" subsection.
 - **The lexicon's LEX-002/LEX-003/LEX-007 definitions originally overlapped**
   ("boundary point... where traffic enters or leaves") enough that even a
   careful blind reader confused them from prose alone. Rewritten with
