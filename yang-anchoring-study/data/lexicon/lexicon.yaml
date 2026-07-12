@@ -66,7 +66,13 @@
     packet) within which nodes, links, and termination points are
     defined; entities in one layer are related to, but not directly
     interchangeable with, entities in another layer without an
-    explicit adaptation or stacking relationship.
+    explicit adaptation or stacking relationship. A leaf or attribute
+    that names or identifies which layer/protocol domain an entity
+    operates in (a "layer-protocol-name"-style value) is always
+    subsumed_by this entry, regardless of which kind of entity it is
+    attached to (a node, link, termination point, or client-access
+    point): the value itself denotes the layer concept, not the
+    entity it decorates.
 
 - id: LEX-006
   preferred_name: service

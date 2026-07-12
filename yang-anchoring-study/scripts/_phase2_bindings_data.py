@@ -191,11 +191,18 @@ DEFINITION_BASED = [
     ("tapi", "tapi-path-computation", "/context/path-computation-context/path", "NONE", "none", 0.65),
     ("tapi", "tapi-connectivity", "/context/connectivity-context/connectivity-service/connection", "LEX-006", "subsumed_by", 0.55),
     ("tapi", "tapi-connectivity", "/context/connectivity-context/connectivity-service/routing-constraint/risk-diversity-characteristic", "LEX-009", "subsumed_by", 0.55),
+    # Investigated: kept as the officially-recorded call per the study's no-re-rolling rule, but a
+    # diagnostic second call (not used for scoring) returned a clean, confident NONE (0.85) matching gold,
+    # suggesting this specific wrong answer is single-call noise on a genuinely borderline case (RFC 8345's
+    # "layered network topologies" language is adjacent to, but distinct from, LEX-005's protocol-layer
+    # concept), not a stable, fixable lexicon defect like the LEX-003/LEX-005 issues below were. See FINDINGS.md.
     ("ietf", "ietf-network", "/networks/network/supporting-network", "LEX-005", "none", 0.55),
     ("ietf", "ietf-network", "/networks/network/node/supporting-node", "LEX-001", "subsumed_by", 0.55),
-    # path context (under service-interface-point) outweighed the description's own "layer protocol"
-    # content; a real definition-based error, mirrors the client-svc/available-capacity pattern in reverse
-    ("tapi", "tapi-common", "/context/service-interface-point/layer-protocol-name", "LEX-007", "subsumed_by", 0.6),
+    # LEX-005-FIX RETEST, now correct: LEX-005's definition was sharpened with an explicit rule that any
+    # "layer-protocol-name"-style attribute is subsumed_by LEX-005 regardless of parent entity, closing the
+    # gap where path context (service-interface-point = LEX-007) was outweighing the node's own "layer
+    # protocol" description content. All 3 layer-protocol-name rows in this gold standard are now consistent.
+    ("tapi", "tapi-common", "/context/service-interface-point/layer-protocol-name", "LEX-005", "subsumed_by", 0.9),
 ]
 
 assert len(NAME_ONLY) == 58, len(NAME_ONLY)
