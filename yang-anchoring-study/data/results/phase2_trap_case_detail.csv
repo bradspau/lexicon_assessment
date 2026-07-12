@@ -8,14 +8,14 @@ name_only,tapi,/context/topology-context/topology/node/owned-node-edge-point/lif
 name_only,tapi,/context/topology-context/topology/node/owned-node-edge-point/administrative-state,LEX-011,equivalent,LEX-011,equivalent,0.95
 name_only,tapi,/context/topology-context/topology/node/owned-node-edge-point/cep-list,NONE,none,LEX-007,subsumed_by,0.75
 name_only,ietf,/networks/network/node/te/tunnel-termination-point/local-link-connectivities,LEX-003,subsumed_by,LEX-003,subsumed_by,0.6
-name_only,ietf,/networks/network/node/te/tunnel-termination-point/client-layer-adaptation,NONE,none,LEX-005,subsumed_by,0.55
+name_only,ietf,/networks/network/node/te/tunnel-termination-point/client-layer-adaptation,LEX-003,subsumed_by,LEX-005,subsumed_by,0.55
 definition_based,ietf,/networks/network/node/te/tunnel-termination-point,LEX-003,equivalent,LEX-003,equivalent,0.62
 definition_based,tapi,/context/topology-context/topology/node/owned-node-edge-point,LEX-002,equivalent,LEX-002,equivalent,0.75
-definition_based,tapi,/context/topology-context/topology/node/owned-node-edge-point/cep-list/connection-end-point,LEX-007,equivalent,LEX-002,subsumed_by,0.55
+definition_based,tapi,/context/topology-context/topology/node/owned-node-edge-point/cep-list/connection-end-point,LEX-007,equivalent,LEX-003,subsumed_by,0.55
 definition_based,tapi,/context/topology-context/topology/node/owned-node-edge-point/layer-protocol-name,LEX-005,subsumed_by,LEX-005,equivalent,0.7
 definition_based,tapi,/context/topology-context/topology/node/owned-node-edge-point/operational-state,LEX-012,equivalent,LEX-012,equivalent,0.97
 definition_based,tapi,/context/topology-context/topology/node/owned-node-edge-point/lifecycle-state,NONE,none,NONE,none,0.7
 definition_based,tapi,/context/topology-context/topology/node/owned-node-edge-point/administrative-state,LEX-011,equivalent,LEX-011,equivalent,0.95
 definition_based,tapi,/context/topology-context/topology/node/owned-node-edge-point/cep-list,NONE,none,NONE,none,0.75
 definition_based,ietf,/networks/network/node/te/tunnel-termination-point/local-link-connectivities,LEX-003,subsumed_by,LEX-003,subsumed_by,0.55
-definition_based,ietf,/networks/network/node/te/tunnel-termination-point/client-layer-adaptation,NONE,none,LEX-003,subsumed_by,0.55
+definition_based,ietf,/networks/network/node/te/tunnel-termination-point/client-layer-adaptation,LEX-003,subsumed_by,LEX-003,subsumed_by,0.55

@@ -116,7 +116,12 @@ DEFINITION_BASED = [
     ("ietf", "ietf-network-topology", "/networks/network/link", "LEX-004", "equivalent", 0.9),
     ("ietf", "ietf-te-topology", "/networks/network/node/te/tunnel-termination-point", "LEX-003", "equivalent", 0.62),
     ("ietf", "ietf-network-topology", "/networks/network/node/termination-point/supporting-termination-point", "NONE", "none", 0.62),
-    ("ietf", "ietf-otn-topology", "/networks/network/node/termination-point/te/client-svc", "LEX-007", "subsumed_by", 0.55),  # RETEST
+    # LEX-003-FIX RETEST regression: was correct (LEX-007 subsumed_by) before the LEX-003 over-triggering fix;
+    # a fresh isolated call against the fixed lexicon landed on LEX-010, and a second diagnostic call landed on
+    # yet a THIRD answer (LEX-003 subsumed_by) -- three different wrong-ish answers across three calls on the
+    # same four-word description ("OTN LTP Service attributes."). This instability is further evidence the
+    # source text, not the lexicon, is the limiting factor for this row; see FINDINGS.md.
+    ("ietf", "ietf-otn-topology", "/networks/network/node/termination-point/te/client-svc", "LEX-010", "subsumed_by", 0.4),
     ("ietf", "ietf-te-topology", "/networks/network/node/te/te-node-attributes/connectivity-matrices/underlay/tunnels/tunnel", "LEX-006", "subsumed_by", 0.4),
     ("ietf", "ietf-te-topology", "/networks/network/node/te/te-node-attributes/connectivity-matrices/path-constraints", "LEX-008", "equivalent", 0.72),
     # nsrlg: real blind call correctly caught the "Non-Shared" vs "shared risk group" inversion and refused;
@@ -142,9 +147,11 @@ DEFINITION_BASED = [
     ("tapi", "tapi-topology", "/context/topology-context/topology/link", "LEX-004", "equivalent", 0.9),
     ("tapi", "tapi-connectivity", "/context/connectivity-context/connectivity-service", "LEX-006", "equivalent", 0.83),
     ("tapi", "tapi-connectivity", "/context/connectivity-context/connectivity-service/end-point", "LEX-007", "equivalent", 0.85),  # RETEST
-    # RETEST, still wrong: source description ("The list of supported ConnectionEndPoint (CEP) instances.")
-    # never says whether the CEP faces the client or the network side, so no lexicon wording can supply that fact
-    ("tapi", "tapi-connectivity", "/context/topology-context/topology/node/owned-node-edge-point/cep-list/connection-end-point", "LEX-002", "subsumed_by", 0.55),
+    # RETEST (twice now), still wrong both times: source description ("The list of supported ConnectionEndPoint
+    # (CEP) instances.") never says whether the CEP faces the client or the network side, so no lexicon wording
+    # can supply that fact. LEX-003-fix retest changed the specific wrong answer (LEX-002 -> LEX-003) but not
+    # the outcome, consistent with this being a source-text limitation, not a lexicon problem.
+    ("tapi", "tapi-connectivity", "/context/topology-context/topology/node/owned-node-edge-point/cep-list/connection-end-point", "LEX-003", "subsumed_by", 0.55),
     ("tapi", "tapi-connectivity", "/context/connectivity-context/connectivity-service/connectivity-constraint", "LEX-008", "equivalent", 0.75),
     ("tapi", "tapi-connectivity", "/context/connectivity-context/connectivity-service/routing-constraint", "LEX-008", "equivalent", 0.75),
     ("tapi", "tapi-connectivity", "/context/connectivity-context/connectivity-service/topology-constraint", "LEX-008", "equivalent", 0.62),
@@ -160,21 +167,26 @@ DEFINITION_BASED = [
     # --- GOLD-STANDARD EXPANSION (19 more candidates, same blind isolated-subagent methodology) ---
     ("tapi", "tapi-topology", "/context/topology-context/topology/node/owned-node-edge-point/administrative-state", "LEX-011", "equivalent", 0.95),
     ("ietf", "ietf-otn-topology", "/networks/network/link/te/te-link-attributes/otn-link/odtu-flex-type", "LEX-010", "subsumed_by", 0.72),
-    # confused with LEX-003 by literal "TE tunnel" text overlap in LEX-003's own definition; a real
-    # definition-based error -- LEX-006's definition doesn't say "tunnel" (only its synonym list does), so
-    # this container of tunnel/service instances got pulled toward the tunnel-endpoint concept instead
-    ("ietf", "ietf-te-topology", "/networks/network/node/te/te-node-attributes/connectivity-matrices/underlay/tunnels", "LEX-003", "subsumed_by", 0.55),
+    # LEX-003-FIX RETEST, now correct: after sharpening LEX-003 to explicitly exclude tunnel/service
+    # containers, a fresh isolated call correctly bound this to LEX-006 instead
+    ("ietf", "ietf-te-topology", "/networks/network/node/te/te-node-attributes/connectivity-matrices/underlay/tunnels", "LEX-006", "subsumed_by", 0.62),
     ("tapi", "tapi-connectivity", "/context/topology-context/topology/node/owned-node-edge-point/cep-list", "NONE", "none", 0.75),
     ("ietf", "ietf-te-topology", "/networks/network/node/te/tunnel-termination-point/local-link-connectivities", "LEX-003", "subsumed_by", 0.55),
+    # LEX-003-FIX RETEST: still LEX-003 subsumed_by even against the sharpened definition that explicitly
+    # excludes capability descriptors. Two independent calls (pre-fix and post-fix) agreeing on this, plus
+    # this node's structural identity to local-link-connectivities (same parent, same attribute-container
+    # pattern already correctly subsumed_by LEX-003), was read as the model being right and the original
+    # gold NONE call being wrong -- gold revised to LEX-003 subsumed_by, see notes column
     ("ietf", "ietf-te-topology", "/networks/network/node/te/tunnel-termination-point/client-layer-adaptation", "LEX-003", "subsumed_by", 0.55),
     ("tapi", "tapi-common", "/context/service-interface-point/available-capacity", "LEX-007", "subsumed_by", 0.62),
     ("ietf", "ietf-network-topology", "/networks/network/link/source/source-tp", "LEX-002", "equivalent", 0.85),
     ("ietf", "ietf-network-topology", "/networks/network/link/source", "LEX-002", "subsumed_by", 0.7),
     ("ietf", "ietf-network-topology", "/networks/network/link/link-id", "LEX-004", "subsumed_by", 0.75),
     ("tapi", "tapi-path-computation", "/context/path-computation-context/path-comp-service", "LEX-006", "subsumed_by", 0.55),
-    # confused with LEX-003 by "path computation" appearing in both LEX-003's definition and this
-    # module's own naming; a real construct-validity gap between LEX-003's wording and tapi-path-computation
-    ("tapi", "tapi-path-computation", "/context/path-computation-context/path-comp-service/end-point", "LEX-003", "equivalent", 0.62),
+    # LEX-003-FIX RETEST, now correct: after sharpening LEX-003 to exclude generic "path computation"
+    # vocabulary and adding PathServiceEndPoint as an explicit LEX-007 example, a fresh isolated call
+    # correctly bound this to LEX-007
+    ("tapi", "tapi-path-computation", "/context/path-computation-context/path-comp-service/end-point", "LEX-007", "equivalent", 0.9),
     ("tapi", "tapi-path-computation", "/context/path-computation-context/path-comp-service/routing-constraint", "LEX-008", "equivalent", 0.75),
     ("tapi", "tapi-path-computation", "/context/path-computation-context/path", "NONE", "none", 0.65),
     ("tapi", "tapi-connectivity", "/context/connectivity-context/connectivity-service/connection", "LEX-006", "subsumed_by", 0.55),

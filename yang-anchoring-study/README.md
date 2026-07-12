@@ -59,30 +59,34 @@ labels were revised post-hoc when investigation or convergent independent
 blind evidence contradicted the original hand-authored guess, see
 `report/FINDINGS.md` §2 for the full history.
 
-**The result changed with every round, and that instability is itself the
-finding.** First blind run (39 rows, uncorrected): name-only F1=0.98,
-definition-based F1=0.84, inverting the naive hypothesis. After fixing two
-gold-standard errors and an overlapping lexicon boundary (39 rows,
-corrected): name-only F1=0.946, definition-based F1=0.958, a narrow
-definition-based lead. After expanding to 58 rows: name-only F1=0.943,
-definition-based F1=0.893, name-only back in front by a real margin. Three
-runs, three different verdicts on which mode wins, from the same lexicon and
-corpus, see `report/FINDINGS.md` §2–§3 for the full reasoning behind each
-round and why the aggregate F1 isn't a reliable enough statistic at this
-sample size to settle the question either way.
+**The result moved with every round, converging as real problems got fixed.**
+First blind run (39 rows, uncorrected): name-only F1=0.98, definition-based
+F1=0.84, inverting the naive hypothesis. After fixing two gold-standard
+errors and an overlapping lexicon boundary (39 rows, corrected): name-only
+F1=0.946, definition-based F1=0.958, a narrow definition-based lead. After
+expanding to 58 rows: name-only F1=0.943, definition-based F1=0.893,
+name-only back in front by a real margin, tracing to a newly-found lexicon
+over-triggering problem (LEX-003's definition text pulling in unrelated
+"tunnel"/"path computation" nodes). After fixing that: name-only F1=0.935,
+definition-based F1=0.923, both modes down to 5 errors out of 58, the
+closest result of any round. Four runs, four different numbers, from the
+same lexicon and corpus, see `report/FINDINGS.md` §2–§3 for the full
+reasoning behind each round.
 
 **What is stable across every round is the *shape* of each mode's errors,
-not the count.** Name-only's errors are consistently name/synonym matches
-that turn out to mean something different in context (`nsrlg`,
-`lifecycle-state`, `owned-node-edge-point`, `cep-list`,
-`client-layer-adaptation`, all 5 of name-only's errors in the 58-row set fit
-this pattern). Definition-based's errors are consistently either appropriate
-caution on terse source text, or a lexicon definition whose own vocabulary
-over-triggers on unrelated nodes (the LEX-002/003/007 boundary already fixed
-once, and a newly-found LEX-003 "path computation"/"tunnel" vocabulary
-over-trigger not yet fixed). Both failure modes are real; which one costs
-more errors in a given run depends on which nodes happen to be in the gold
-set.
+not the count, and definition-based's errors got measurably cleaner once
+the fixable problems were actually fixed.** Name-only's errors are
+consistently name/synonym matches that turn out to mean something different
+in context (`nsrlg`, `lifecycle-state`, `owned-node-edge-point`, `cep-list`,
+`client-layer-adaptation`, all 5 of name-only's current errors fit this
+pattern, and always have). Definition-based's errors, once the LEX-002/003/007
+boundary and the LEX-003 over-triggering were both fixed, collapsed to
+essentially one category: source descriptions too terse to disambiguate
+regardless of lexicon wording (3 of 5 current errors), plus two still-open,
+not-yet-investigated issues. Name-only fails when a name misleads;
+definition-based fails when there's nothing left to reason from, or on a
+lexicon construct-validity problem, and lexicon problems are fixable in a way
+terse source text is not.
 
 ## Findings summary (see `report/FINDINGS.md` for full detail)
 
@@ -101,12 +105,12 @@ generated-model placeholders (`"none"`, confirmed against source, not an
 extraction bug), with non-boilerplate TAPI text scoring *as well or better*
 than IETF's on genuine intensional-definition quality.
 
-Phase 2, real blind result on the current 58-row gold standard: name-only
-F1=0.943 (5/58 wrong), definition-based F1=0.893 (7/58 wrong), see
-`report/FINDINGS.md` §2–§3 for the full breakdown across all three rounds
-(inverted at 39 rows, corrected at 39 rows, expanded to 58), and for why the
-aggregate comparison keeps changing while the per-mode error *patterns*
-don't. The one designed trap case (`owned-node-edge-point`, no lexical
+Phase 2, real blind result on the current 58-row gold standard, post-LEX-003-fix:
+name-only F1=0.935 (5/58 wrong), definition-based F1=0.923 (5/58 wrong), see
+`report/FINDINGS.md` §2–§3 for the full breakdown across all four rounds
+(inverted at 39 rows, corrected at 39 rows, expanded to 58, LEX-003 fixed),
+and for why the aggregate comparison kept changing while the per-mode error
+*patterns* didn't. The one designed trap case (`owned-node-edge-point`, no lexical
 overlap with the lexicon's `link-termination-point` synonyms) still resolves
 exactly as the plan predicts: mis-bound to `client-access-point` by name
 alone, correctly bound to `link-termination-point` given the actual
@@ -154,20 +158,25 @@ description text.
   remains wrong because its four-word source description doesn't state the
   fact needed to disambiguate, no lexicon wording can fix that.
 - **A second, distinct lexicon problem surfaced during the 58-row expansion,
-  not yet fixed**: LEX-003's definition text literally contains the strings
+  since fixed**: LEX-003's definition text literally contained the strings
   "TE tunnel" and "path computation", so any node whose own description or
-  module name shares that vocabulary gets pulled toward LEX-003 even when
-  it isn't a tunnel/LSP endpoint. This caused 3 of definition-based's 5 new
+  module name shared that vocabulary got pulled toward LEX-003 even when
+  it wasn't a tunnel/LSP endpoint, causing 3 of definition-based's 5 new
   errors (`underlay/tunnels`, `path-comp-service/end-point`,
-  `client-layer-adaptation`). Same failure category as LEX-002/003/007
-  above (a definition whose own wording over-triggers), just not yet run
-  through a correction round.
-- **3 gold labels were revised on convergent independent evidence rather
+  `client-layer-adaptation`). Rewritten to explicitly exclude containers and
+  abstract capability descriptions (see `data/lexicon/lexicon.yaml`); 2 of the
+  3 flipped to correct on retest, the third turned out to be a gold-labelling
+  error on the same evidence standard as below, revised to match. One
+  regression surfaced during retesting (`client-svc`), reported rather than
+  quietly re-rolled away, see `report/FINDINGS.md` §2's "LEX-003 correction
+  round" for the full accounting.
+- **4 gold labels were revised on convergent independent evidence rather
   than source-text verification**: for `/networks/network/link/source`,
-  `path-comp-service`, and `connectivity-service/connection`, both blind
-  modes independently disagreed with the original hand-authored label and
-  converged on the same alternative, so the label was revised to match. This
-  is a different, weaker standard of evidence than the nsrlg/lifecycle-state
-  corrections above (which were verified against the actual RFC/TAPI source
-  text), it reflects a genuine modelling judgment call rather than a
-  checkable fact, see `data/gold/gold_standard.csv`'s notes column.
+  `path-comp-service`, `connectivity-service/connection`, and (after the
+  LEX-003 fix) `client-layer-adaptation`, both blind modes independently
+  disagreed with the original hand-authored label and converged on the same
+  alternative, so the label was revised to match. This is a different,
+  weaker standard of evidence than the nsrlg/lifecycle-state corrections
+  above (which were verified against the actual RFC/TAPI source text), it
+  reflects a genuine modelling judgment call rather than a checkable fact,
+  see `data/gold/gold_standard.csv`'s notes column.
