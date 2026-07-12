@@ -7,7 +7,7 @@ ietf,ietf-network-topology,/networks/network/node/termination-point/supporting-t
 ietf,ietf-otn-topology,/networks/network/node/termination-point/te/client-svc,LEX-007,equivalent,
 ietf,ietf-te-topology,/networks/network/node/te/te-node-attributes/connectivity-matrices/underlay/tunnels/tunnel,LEX-006,equivalent,
 ietf,ietf-te-topology,/networks/network/node/te/te-node-attributes/connectivity-matrices/path-constraints,LEX-008,equivalent,
-ietf,ietf-te-topology,/networks/network/te/nsrlg,LEX-009,equivalent,
+ietf,ietf-te-topology,/networks/network/te/nsrlg,NONE,none,"Corrected post-hoc: NSRLG (Non-Shared Risk Link Group) requires underlay paths to be mutually DISJOINT across the group, the operational opposite of LEX-009's shared-risk-group (resources that DO share risk, grouped so correlated failure can be avoided). Lexical similarity ('risk group') masked an opposite semantic relationship; original LEX-009 label was a gold-authoring error, not a binder error."
 ietf,ietf-otn-topology,/networks/network/node/termination-point/te/interface-switching-capability/max-lsp-bandwidth/te-bandwidth/technology/otn-bandwidth/odu-type,LEX-010,equivalent,
 ietf,ietf-te-topology,/networks/network/node/termination-point/te/admin-status,LEX-011,equivalent,
 ietf,ietf-te-topology,/networks/network/node/termination-point/te/oper-status,LEX-012,equivalent,
@@ -34,7 +34,7 @@ tapi,tapi-topology,/context/topology-context/topology/node/node-rule-group/risk-
 tapi,tapi-topology,/context/topology-context/topology/link/layer-protocol-name,LEX-005,subsumed_by,"The specific layer-protocol name value for a link; an attribute of the layer concept, not the layer concept itself."
 tapi,tapi-topology,/context/topology-context/topology/node/owned-node-edge-point/layer-protocol-name,LEX-005,subsumed_by,
 tapi,tapi-topology,/context/topology-context/topology/node/owned-node-edge-point/operational-state,LEX-012,equivalent,
-tapi,tapi-topology,/context/topology-context/topology/node/owned-node-edge-point/lifecycle-state,LEX-011,equivalent,"TAPI's lifecycle-state (deployment/allocation/withdrawal tracking) maps to administrative-state's operator-intent concept, not operational-state."
+tapi,tapi-topology,/context/topology-context/topology/node/owned-node-edge-point/lifecycle-state,NONE,none,"Corrected post-hoc: the original note reasoned lifecycle-state maps to LEX-011 rather than LEX-012, but didn't test whether it maps to either. 'Planned deployment, allocation to clients, withdrawal' is a provisioning-lifecycle stage, not LEX-011's in-service/out-of-service operator intent -- a resource can be administratively 'in service' while its lifecycle-state is still 'planned'. No current lexicon entry covers this concept; treating it as LEX-011 was a gold-authoring error."
 tapi,tapi-common,/context/service-interface-point,LEX-007,equivalent,SIP: the client-facing access point exposed by the network to a client.
 tapi,tapi-topology,/context/topology-context/topology/node/node-rule-group,NONE,none,"A rule governing which NEP combinations are connectable within a node; not a good match to any current lexicon entry (structural/adjacency rule, not a risk/routing/topology constraint on a path). Deliberate 'none' control case."
 tapi,tapi-path-computation,/context/path-computation-context/path/link,LEX-004,equivalent,

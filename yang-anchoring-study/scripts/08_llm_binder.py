@@ -47,6 +47,10 @@ def node_block(row, mode):
 PROMPT = """You are binding a network-management data-model node to the single best-matching
 entry in a reference lexicon, or to "NONE" if no entry fits.
 
+If the node represents an attribute container, property bag, or reusable
+template for an entry in the lexicon (rather than being an instance of that
+entry itself), classify it as "subsumed_by" that entry rather than "NONE".
+
 Reference lexicon:
 {lexicon}
 

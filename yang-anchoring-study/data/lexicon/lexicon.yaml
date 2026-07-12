@@ -19,19 +19,25 @@
   synonyms: [termination-point, port]
   entity_class: termination-point-like
   definition: >
-    A boundary point on a forwarding element where a topological link
-    attaches; the point at which traffic enters or leaves the element
-    toward a specific link.
+    A boundary point on a forwarding element where a topological,
+    network-internal link attaches; the point at which traffic enters
+    or leaves the element toward a specific link to another forwarding
+    element. Faces another network element across a link, never a
+    client or service boundary (contrast LEX-007) and never defined in
+    terms of tunnel/LSP provisioning (contrast LEX-003).
 
 - id: LEX-003
   preferred_name: service-anchor
   synonyms: [tunnel-termination-point, tunnel-endpoint]
   entity_class: service-boundary
   definition: >
-    The head or tail point of an end-to-end service or tunnel, as
-    distinct from a physical link-attachment point; it identifies
-    where a service begins or ends, not where a link is physically
-    attached.
+    The head or tail point of a TE tunnel or LSP, used specifically as
+    an endpoint for path computation and tunnel/LSP provisioning
+    within a traffic-engineering topology. Distinct from a physical
+    link-attachment point (LEX-002) and from a general client-facing
+    service boundary (LEX-007): unlike LEX-007, a service-anchor is
+    defined by its role in tunnel/LSP provisioning, not by facing a
+    client outside the network.
 
 - id: LEX-004
   preferred_name: topological-link
@@ -68,13 +74,17 @@
 
 - id: LEX-007
   preferred_name: client-access-point
-  synonyms: [client-svc, connection-end-point, cep, csep]
+  synonyms: [client-svc, connection-end-point, cep, csep, sip, service-interface-point]
   entity_class: termination-point-like
   definition: >
-    The point at which a client signal enters or leaves a network
-    element to be carried by a service, distinguished from a
-    link-termination-point in that it faces the client/service side
-    of an adaptation rather than the network-link side.
+    The point at which a client signal, or a client's connectivity
+    service, enters or leaves the network as a whole: the network's
+    external demarcation toward a client or customer (e.g. a Service
+    Interface Point, ConnectivityServiceEndPoint, or client-facing
+    ConnectionEndPoint). Distinguished from LEX-002 by facing the
+    client/service side of an adaptation rather than another network
+    element, and from LEX-003 by not being defined in terms of TE
+    tunnel/LSP provisioning at all.
 
 - id: LEX-008
   preferred_name: forwarding-constraint

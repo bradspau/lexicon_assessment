@@ -22,8 +22,12 @@ def score(df, relation_filter=None, exclude_trivial_name_match=False):
 
     Per row: TP = binder asserted the exact correct lexicon_id (gold isn't
     NONE). FP = binder asserted *some* real lexicon_id but it's wrong
-    (whether gold wanted a different id or no match at all). FN = binder
-    said NONE but gold wanted a real match. TN = binder said NONE and gold
+    (whether gold wanted a different id or no match at all). FN = gold
+    wanted a real match and the binder didn't produce it, whether it said
+    NONE or asserted a different (wrong) lexicon_id -- a wrong guess is
+    double-counted as both FP and FN, the standard detection+classification
+    convention (as in NER/IE scoring), since it is simultaneously a false
+    assertion and a missed correct answer. TN = binder said NONE and gold
     is NONE (contributes to neither precision nor recall, same as always).
     """
     d = df.copy()
@@ -36,7 +40,7 @@ def score(df, relation_filter=None, exclude_trivial_name_match=False):
     is_none_pred = d["lexicon_id"] == "NONE"
     tp = ((~is_none_gold) & (d["lexicon_id"] == d["gold_lexicon_id"])).sum()
     fp = ((~is_none_pred) & (d["lexicon_id"] != d["gold_lexicon_id"])).sum()
-    fn = (is_none_pred & (~is_none_gold)).sum()
+    fn = ((~is_none_gold) & (d["lexicon_id"] != d["gold_lexicon_id"])).sum()
 
     precision = tp / (tp + fp) if (tp + fp) > 0 else 0.0
     recall = tp / (tp + fn) if (tp + fn) > 0 else 0.0
