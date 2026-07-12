@@ -53,11 +53,15 @@ The 150 ISO-704 rubric labels and the gold-standard bindings themselves are
 **not** independent, both were authored by me (Claude, in this same
 conversation), hand-encoded into `scripts/_iso704_labels.py` and
 `data/gold/gold_standard.csv`. Read those as recorded judgments, not as logic
-to trust blindly; the reported κ values (0.880, 0.926) are self-consistency
+to trust blindly; the reported κ values (0.880 for ISO-704, 0.852 for the
+gold-standard second-annotator check, n=15 either way) are self-consistency
 checks on those judgments, not inter-annotator validation. A handful of gold
 labels were revised post-hoc when investigation or convergent independent
 blind evidence contradicted the original hand-authored guess, see
-`report/FINDINGS.md` §2 for the full history.
+`report/FINDINGS.md` §2 for the full history, including a note on why the
+second-annotator κ reads lower now than it did earlier in the process (a
+later gold-standard correction desynced the frozen second-pass comparison
+file, not a new disagreement).
 
 **The result moved with every round, converging as real problems got fixed,
 then held and widened under a second, larger expansion.**
@@ -160,9 +164,13 @@ description text.
   shared risk); `lifecycle-state` was gold-labelled as LEX-011
   administrative-state despite describing a distinct provisioning-lifecycle
   concept. Both are now corrected to `NONE` in `data/gold/gold_standard.csv`
-  (see its notes column). The reported second-annotator κ = 0.926 predates
-  this correction and is a self-consistency check, not inter-annotator
-  validation. A follow-up symmetric re-audit of all 37 rows where the binder
+  (see its notes column). The reported second-annotator κ was originally
+  0.926, but the `nsrlg` fix desynced that number from the frozen 15-row
+  comparison file it's computed against (still holding the old, uncorrected
+  label); re-running the check now gives κ = 0.852. Either way it's a
+  self-consistency check, not inter-annotator validation, see
+  `report/FINDINGS.md` §2 for the detail. A follow-up symmetric re-audit of
+  all 37 rows where the binder
   already agreed with gold found no further `lexicon_id` errors, one relation
   label softened (`client-svc`, `equivalent` → `subsumed_by`, no scoring
   impact), and 3 rows (`odu-type`, `admin-status`, `oper-status`) whose source
