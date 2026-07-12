@@ -9,6 +9,7 @@ name_only,tapi,/context/topology-context/topology/node/owned-node-edge-point/adm
 name_only,tapi,/context/topology-context/topology/node/owned-node-edge-point/cep-list,NONE,none,LEX-007,subsumed_by,0.75
 name_only,ietf,/networks/network/node/te/tunnel-termination-point/local-link-connectivities,LEX-003,subsumed_by,LEX-003,subsumed_by,0.6
 name_only,ietf,/networks/network/node/te/tunnel-termination-point/client-layer-adaptation,LEX-003,subsumed_by,LEX-005,subsumed_by,0.55
+name_only,tapi,/context/topology-context/topology/node/owned-node-edge-point/cep-list/connection-end-point/parent-node-edge-point,LEX-002,equivalent,LEX-007,subsumed_by,0.6
 definition_based,ietf,/networks/network/node/te/tunnel-termination-point,LEX-003,equivalent,LEX-003,equivalent,0.62
 definition_based,tapi,/context/topology-context/topology/node/owned-node-edge-point,LEX-002,equivalent,LEX-002,equivalent,0.75
 definition_based,tapi,/context/topology-context/topology/node/owned-node-edge-point/cep-list/connection-end-point,LEX-007,equivalent,LEX-003,subsumed_by,0.55
@@ -19,3 +20,4 @@ definition_based,tapi,/context/topology-context/topology/node/owned-node-edge-po
 definition_based,tapi,/context/topology-context/topology/node/owned-node-edge-point/cep-list,NONE,none,NONE,none,0.75
 definition_based,ietf,/networks/network/node/te/tunnel-termination-point/local-link-connectivities,LEX-003,subsumed_by,LEX-003,subsumed_by,0.55
 definition_based,ietf,/networks/network/node/te/tunnel-termination-point/client-layer-adaptation,LEX-003,subsumed_by,LEX-003,subsumed_by,0.55
+definition_based,tapi,/context/topology-context/topology/node/owned-node-edge-point/cep-list/connection-end-point/parent-node-edge-point,LEX-002,equivalent,LEX-002,subsumed_by,0.55

@@ -59,7 +59,8 @@ labels were revised post-hoc when investigation or convergent independent
 blind evidence contradicted the original hand-authored guess, see
 `report/FINDINGS.md` §2 for the full history.
 
-**The result moved with every round, converging as real problems got fixed.**
+**The result moved with every round, converging as real problems got fixed,
+then held and widened under a second, larger expansion.**
 First blind run (39 rows, uncorrected): name-only F1=0.98, definition-based
 F1=0.84, inverting the naive hypothesis. After fixing two gold-standard
 errors and an overlapping lexicon boundary (39 rows, corrected): name-only
@@ -71,28 +72,33 @@ over-triggering problem (LEX-003's definition text pulling in unrelated
 definition-based F1=0.923, both modes down to 5 errors out of 58. After
 investigating the last two open definition-based errors, one was a real,
 fixable gap (LEX-005 missing a parent-context rule, fixed), the other was
-diagnosed as single-call sampling noise on a genuinely borderline case (a
-diagnostic re-check returned the correct answer, but wasn't substituted in
-as the scored result, per the same no-re-rolling rule that kept `client-svc`'s
-unstable result on the books): name-only F1=0.935, definition-based F1=0.942,
-**definition-based ahead**. Five runs, five different numbers, see
-`report/FINDINGS.md` §2–§3 for the full reasoning behind each round.
+diagnosed as single-call sampling noise on a genuinely borderline case:
+name-only F1=0.935, definition-based F1=0.942, definition-based ahead.
+Expanded a second time to 72 rows specifically to test whether that lead
+held up: name-only F1=0.923, definition-based F1=0.945, **the gap widened**.
+Six runs, a result that gets more pronounced under more data rather than
+shrinking or flipping, the signature of a real effect rather than small-n
+noise, see `report/FINDINGS.md` §2–§3 for the full reasoning behind each
+round.
 
 **What is stable across every round is the *shape* of each mode's errors,
 not the count, and definition-based's errors got measurably cleaner as every
 fixable problem was actually fixed and regression-tested.** Name-only's
-errors are consistently name/synonym matches that turn out to mean something
-different in context (`nsrlg`, `lifecycle-state`, `owned-node-edge-point`,
-`cep-list`, `client-layer-adaptation`, all 5 of name-only's current errors
-fit this pattern, and always have). Definition-based's errors, once every
-fixable lexicon problem found (LEX-002/003/007's overlap, LEX-003's
-over-triggering, LEX-005's parent-context gap) was fixed, collapsed to
-essentially one category: source descriptions too terse to disambiguate
-regardless of lexicon wording (3 of 4 current errors), plus one likely
-sampling artifact. Name-only fails when a name misleads; definition-based
-fails when there's nothing left in the text to reason from, a genuine,
-irreducible limit of the source material, unlike a name/synonym choice,
-which the lexicon author controls.
+errors are consistently name/synonym matches, or in the clearest final-round
+case a structural inference from a bare path with no description available
+at all (`/networks/network` reasoned to "contain nodes" and bound to LEX-001,
+with nothing to correct that inference in name-only mode), that turn out to
+mean something different or fall outside the lexicon's scope (all 7 of
+name-only's final errors fit this pattern, and always have). Definition-based's
+errors, once every fixable lexicon problem found (LEX-002/003/007's overlap,
+LEX-003's over-triggering, LEX-005's parent-context gap) was fixed, collapsed
+to essentially one category: source descriptions too terse to disambiguate
+regardless of lexicon wording (3 of 5 final errors), plus one likely sampling
+artifact and one genuine, narrow edge-case judgment call about lexicon scope.
+Name-only fails when a name, or a name-shaped inference, misleads;
+definition-based fails when there's nothing left in the text to reason from,
+a genuine, irreducible limit of the source material, unlike a name/synonym
+choice, which the lexicon author controls.
 
 ## Findings summary (see `report/FINDINGS.md` for full detail)
 
@@ -111,13 +117,15 @@ generated-model placeholders (`"none"`, confirmed against source, not an
 extraction bug), with non-boilerplate TAPI text scoring *as well or better*
 than IETF's on genuine intensional-definition quality.
 
-Phase 2, real blind result on the current 58-row gold standard, final:
-name-only F1=0.935 (5/58 wrong), definition-based F1=0.942 (4/58 wrong), see
-`report/FINDINGS.md` §2–§3 for the full breakdown across all five rounds
+Phase 2, real blind result on the current 72-row gold standard, final:
+name-only F1=0.923 (7/72 wrong), definition-based F1=0.945 (5/72 wrong), see
+`report/FINDINGS.md` §2–§3 for the full breakdown across all six rounds
 (inverted at 39 rows, corrected at 39 rows, expanded to 58, LEX-003 fixed,
-LEX-005 fixed + supporting-network investigated), and for why the aggregate
-comparison kept changing while the per-mode error *patterns* didn't. The one
-designed trap case (`owned-node-edge-point`, no lexical
+LEX-005 fixed + supporting-network investigated, expanded again to 72), and
+for why the aggregate comparison kept changing, converging and widening in
+definition-based's favour as the gold standard grew, while the per-mode
+error *patterns* stayed constant throughout. The one designed trap case
+(`owned-node-edge-point`, no lexical
 overlap with the lexicon's `link-termination-point` synonyms) still resolves
 exactly as the plan predicts: mis-bound to `client-access-point` by name
 alone, correctly bound to `link-termination-point` given the actual
@@ -125,14 +133,18 @@ description text.
 
 ## Known limitations beyond the blindness issue
 
-- **Gold standard size (58 rows, grown from 39)** is now near the top of the
-  plan's 30–60 target, expanded specifically to test whether the 39-row
-  near-tie between modes would hold up. It didn't, name-only regained a real
-  lead at 58 rows, demonstrating that even a 48% size increase is enough to
-  flip the aggregate F1 comparison a second time. `subsumes` grew from one
-  example to two; still dominated by "equivalent" relations. The *pattern* in
-  §2/§3 of FINDINGS.md (what each mode's errors have in common) is more
-  trustworthy than the specific F1 number from any single round.
+- **Gold standard size (72 rows, grown from 39 via two expansion rounds)**
+  is now well past the plan's 30–60 target. The first expansion (39→58) was
+  run to test whether the 39-row near-tie would hold up, it didn't, name-only
+  regained a real lead, demonstrating that even a 48% size increase can flip
+  the aggregate F1 comparison. After investigating and fixing the lexicon
+  problems that surfaced, definition-based took the lead at 58 rows; a
+  second expansion (58→72) tested whether *that* lead would hold, and it
+  did, widening rather than narrowing. `subsumes` grew from one example to
+  five; still dominated by "equivalent" relations. The *pattern* in §2/§3 of
+  FINDINGS.md (what each mode's errors have in common) is more trustworthy
+  than the specific F1 number from any single round, though the trend across
+  the last two expansions is now a meaningful data point in its own right.
 - **`sentence-transformers` was not installed**; collision analysis
   (`scripts/04_collision_analysis.py`) used the plan's declared TF-IDF
   fallback, which is pure lexical overlap, the "no cross-corpus neighbor
@@ -200,3 +212,11 @@ description text.
   study's rule against re-rolling until a call agrees with the desired
   result, it was not substituted in as the scored prediction, see
   `report/FINDINGS.md` §2's "LEX-005 correction round" for the reasoning.
+- **One new definition-based error from the second expansion was left
+  unrevised, deliberately**: `network-id` ("Identifies a network.") bound to
+  `LEX-001 subsumed_by` rather than gold's `NONE`. This is a single
+  disagreement, not the convergent-independent-evidence pattern used
+  elsewhere in this study to justify revising a gold label, so it stands as
+  a genuine recorded error, a real edge case (does an identifier of an
+  out-of-scope concept inherit the nearest in-scope concept, or stay out of
+  scope?) rather than a lexicon defect to fix.

@@ -108,6 +108,26 @@ NAME_ONLY = [
     ("ietf", "ietf-network", "/networks/network/supporting-network", "NONE", "none", 0.85),
     ("ietf", "ietf-network", "/networks/network/node/supporting-node", "LEX-001", "subsumed_by", 0.6),
     ("tapi", "tapi-common", "/context/service-interface-point/layer-protocol-name", "LEX-005", "equivalent", 0.85),
+
+    # --- SECOND GOLD-STANDARD EXPANSION (14 more candidates, same blind isolated-subagent methodology) ---
+    ("tapi", "tapi-common", "/context/service-interface-point/administrative-state", "LEX-011", "equivalent", 0.9),
+    ("tapi", "tapi-common", "/context/service-interface-point/operational-state", "LEX-012", "equivalent", 0.9),
+    ("ietf", "ietf-otn-topology", "/networks/network/node/te/te-node-attributes/connectivity-matrices/label-restrictions/label-restriction/otn-label-range/odu-type-list", "LEX-010", "subsumed_by", 0.7),
+    ("ietf", "ietf-te-topology", "/networks/network/node/te/te-node-attributes/connectivity-matrices/path-constraints/path-affinity-names/path-affinity-name", "LEX-008", "subsumed_by", 0.6),
+    ("tapi", "tapi-connectivity", "/context/connectivity-context/connectivity-service/end-point/service-interface-point", "LEX-007", "equivalent", 0.9),
+    # TRAP: no lexical overlap with LEX-002's synonyms (termination-point, port); real blind failure mode was
+    # LEX-007 via the "point" surface pattern, matching the owned-node-edge-point trap's shape
+    ("tapi", "tapi-connectivity", "/context/topology-context/topology/node/owned-node-edge-point/cep-list/connection-end-point/parent-node-edge-point", "LEX-007", "subsumed_by", 0.6),
+    ("tapi", "tapi-connectivity", "/context/connectivity-context/connection/server-connection", "LEX-006", "subsumed_by", 0.55),
+    ("tapi", "tapi-common", "/context/service-interface-point/name", "LEX-007", "subsumed_by", 0.7),
+    ("tapi", "tapi-connectivity", "/context/connectivity-context/connectivity-service/resilience-constraint", "LEX-008", "subsumed_by", 0.55),
+    ("ietf", "ietf-network", "/networks/network/node/node-id", "LEX-001", "subsumed_by", 0.7),
+    ("ietf", "ietf-network-topology", "/networks/network/link/destination", "LEX-002", "subsumed_by", 0.65),
+    ("ietf", "ietf-network", "/networks/network/network-types", "NONE", "none", 0.85),
+    ("ietf", "ietf-network", "/networks/network/network-id", "NONE", "none", 0.85),
+    # TRAP: name-only inferred network "subsumes" node from bare path/name reasoning (networks contain nodes),
+    # not a literal synonym match; a different false-friend mechanism than the usual synonym-list overlap
+    ("ietf", "ietf-network", "/networks/network", "LEX-001", "subsumes", 0.7),
 ]
 
 DEFINITION_BASED = [
@@ -203,7 +223,26 @@ DEFINITION_BASED = [
     # gap where path context (service-interface-point = LEX-007) was outweighing the node's own "layer
     # protocol" description content. All 3 layer-protocol-name rows in this gold standard are now consistent.
     ("tapi", "tapi-common", "/context/service-interface-point/layer-protocol-name", "LEX-005", "subsumed_by", 0.9),
+
+    # --- SECOND GOLD-STANDARD EXPANSION (14 more candidates, same blind isolated-subagent methodology) ---
+    ("tapi", "tapi-common", "/context/service-interface-point/administrative-state", "LEX-011", "equivalent", 0.95),
+    ("tapi", "tapi-common", "/context/service-interface-point/operational-state", "LEX-012", "equivalent", 0.95),
+    ("ietf", "ietf-otn-topology", "/networks/network/node/te/te-node-attributes/connectivity-matrices/label-restrictions/label-restriction/otn-label-range/odu-type-list", "LEX-010", "subsumed_by", 0.75),
+    ("ietf", "ietf-te-topology", "/networks/network/node/te/te-node-attributes/connectivity-matrices/path-constraints/path-affinity-names/path-affinity-name", "LEX-008", "subsumed_by", 0.75),
+    ("tapi", "tapi-connectivity", "/context/connectivity-context/connectivity-service/end-point/service-interface-point", "LEX-007", "equivalent", 0.85),
+    ("tapi", "tapi-connectivity", "/context/topology-context/topology/node/owned-node-edge-point/cep-list/connection-end-point/parent-node-edge-point", "LEX-002", "subsumed_by", 0.55),
+    ("tapi", "tapi-connectivity", "/context/connectivity-context/connection/server-connection", "LEX-006", "subsumed_by", 0.55),
+    ("tapi", "tapi-common", "/context/service-interface-point/name", "LEX-007", "subsumed_by", 0.7),
+    ("tapi", "tapi-connectivity", "/context/connectivity-context/connectivity-service/resilience-constraint", "LEX-008", "subsumed_by", 0.55),
+    ("ietf", "ietf-network", "/networks/network/node/node-id", "LEX-001", "subsumed_by", 0.6),
+    ("ietf", "ietf-network-topology", "/networks/network/link/destination", "LEX-002", "subsumed_by", 0.75),
+    ("ietf", "ietf-network", "/networks/network/network-types", "NONE", "none", 0.9),
+    # TRAP: gold is NONE (identifier of the out-of-scope "network" concept), but the real blind call
+    # reasoned "network-id identifies a network which contains nodes" and bound to LEX-001 subsumed_by
+    # instead; a genuine definition-based error, single disagreement, not revised (see FINDINGS.md)
+    ("ietf", "ietf-network", "/networks/network/network-id", "LEX-001", "subsumed_by", 0.55),
+    ("ietf", "ietf-network", "/networks/network", "NONE", "none", 0.7),
 ]
 
-assert len(NAME_ONLY) == 58, len(NAME_ONLY)
-assert len(DEFINITION_BASED) == 58, len(DEFINITION_BASED)
+assert len(NAME_ONLY) == 72, len(NAME_ONLY)
+assert len(DEFINITION_BASED) == 72, len(DEFINITION_BASED)
