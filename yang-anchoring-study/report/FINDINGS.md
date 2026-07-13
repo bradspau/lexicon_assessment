@@ -18,6 +18,8 @@ The one-line version: most of the documentation embedded in these network schema
 
 The detail behind these two outcomes, the specific numbers, the corrections made along the way, and the caveats on how much weight each finding can bear, follows below.
 
+In short, in very simple terms, with the YANG models used, approximately 45% of the descriptions contained intensional data that could possibly be utilised by an LLM. Binding accuracy against a shared lexicon still reached 90+% overall, by adding a lexicon/vocabulary/definition layer that enables mapping from the YANG data to the lexicon. This mapping enables an LLM to determine common concepts between different YANG models, which would simplify integration.
+
 ## §1. Phase 1: Description quality audit
 
 **Corpus:** 4 IETF modules (`ietf-network`, `ietf-network-topology`, `ietf-te-topology`, `ietf-otn-topology`) and 3 TAPI v2.5.2 modules (`tapi-topology`, `tapi-connectivity`, `tapi-common`), plus their transitive import dependencies (fetched separately so pyang could resolve augments/imports but excluded from scoring). Node ownership for augmented nodes (e.g. TE/OTN attributes augmented onto the base `ietf-network`/`ietf-network-topology` tree) was attributed via pyang's `i_module`, not the root module of the tree, see `scripts/02_extract_descriptions.py` docstring for why the plan's primary `pyang -f flatten` CLI approach doesn't work here (it can't see cross-file augment targets when modules are extracted one file at a time).
