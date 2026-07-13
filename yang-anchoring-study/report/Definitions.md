@@ -173,3 +173,22 @@ IETF's `termination-point` and TAPI's `NodeEdgePoint` share no vocabulary at all
 
 ### Why It Matters (Ontology & A2A Context)
 Grounding is the prerequisite for any system that needs to reason across standards, vendors, or agents that do not share a vocabulary. A lexicon or ontology only provides commonality if something is actually anchoring components to it by meaning, a name-matching shortcut can only ground the specific name pairs its author already knew about in advance, and fails silently on any naming convention it has not seen. Genuine anchoring, achieved by reading a component's real definition and reasoning about what it means, generalises to naming conventions never seen before, which is what makes it valuable for A2A protocols and ontology engineering rather than a one-off mapping table.
+
+---
+
+## True Positive / False Positive / False Negative / True Negative
+
+### Definition
+These four terms describe every possible outcome when a prediction is checked against a known correct answer (a gold standard). Together they form what is usually called a confusion matrix, the basis for precision, recall, and F1.
+
+### Key Characteristics
+- **True Positive (TP):** a confident prediction that was correct.
+- **False Positive (FP):** a confident prediction that was wrong.
+- **False Negative (FN):** a correct answer that existed but was not produced, whether by wrongly abstaining or by confidently naming the wrong concept.
+- **True Negative (TN):** a correct abstention, there was no real match, and none was claimed.
+
+### Example
+Grading a system's guesses against a hand-verified gold standard: a TP is the system naming the exact right concept. An FP is the system confidently naming a concept that turns out to be wrong. An FN is a real concept the system missed, whether by saying "no match" or by naming a different wrong one. A TN is the system correctly recognising a genuine "no match" case.
+
+### Why It Matters (Ontology & A2A Context)
+A single accuracy number hides which of these four outcomes is actually driving a result. A system can score well overall while making one kind of mistake, confident wrong assertions, far more often than another, missed matches, and those two failure modes carry very different risks in an automated pipeline: a false positive silently propagates a wrong answer downstream, while a false negative at least signals that no answer was found. Precision and recall exist specifically to separate these two failure modes out, rather than blending them into a single opaque number.
