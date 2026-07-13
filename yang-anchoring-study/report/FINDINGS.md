@@ -29,9 +29,9 @@ In short, in very simple terms, with the YANG models used, approximately 45% of 
 ### Coverage summary (`phase1_coverage_summary.csv`)
 
 | corpus | n_nodes | pct_empty | pct_boilerplate | pct_restates_name | mean_words | median_words |
-|---|---|---|---|---|---|---|
-| ietf | 2,279 | 0.0% | 0.0% | 45.4% | 10.2 | 6 |
-| tapi | 3,418 | 0.0% | 31.0% | 23.3% | 13.4 | 7 |
+| ------ | ------- | --------- | --------------- | ----------------- | ---------- | ------------ |
+| ietf   | 2,279   | 0.0%      | 0.0%            | 45.4%             | 10.2       | 6            |
+| tapi   | 3,418   | 0.0%      | 31.0%           | 23.3%             | 13.4       | 7            |
 
 `pct_boilerplate` includes the literal string `"none"`, which is not an extraction artifact, it's literal source text in TAPI (confirmed against `corpus/tapi/tapi-topology.yang`), almost certainly a leftover from TAPI's UML→YANG code generation. Neither corpus has any truly *empty* description statements.
 
@@ -40,9 +40,9 @@ In short, in very simple terms, with the YANG models used, approximately 45% of 
 150-node stratified sample (75/corpus, `random_state=42`), scored on the 4-way rubric (`intensional` / `extensional_example_only` / `circular_tautological` / `empty_boilerplate`):
 
 | corpus | intensional | circular_tautological | extensional_example_only | empty_boilerplate |
-|---|---|---|---|---|
-| ietf | 44.0% | 49.3% | 6.7% | 0.0% |
-| tapi | 45.3% | 32.0% | 0.0% | 22.7% |
+| ------ | ----------- | --------------------- | ------------------------ | ----------------- |
+| ietf   | 44.0%       | 49.3%                 | 6.7%                     | 0.0%              |
+| tapi   | 45.3%       | 32.0%                 | 0.0%                     | 22.7%             |
 
 **Annotator agreement caveat:** the plan calls for comparing an independent manual pass against an LLM pass on a 30-node overlap. This run had no `ANTHROPIC_API_KEY`, so both the "manual" and "llm" passes in `phase1_iso704_scores.csv` were produced by the same model (Claude) reading the text directly, in two separate passes. Cohen's κ = **0.880** (93.3% simple agreement, n=30) therefore measures *rubric self-consistency*, not true human-vs-LLM agreement, treat it as a floor on reliability, not a validation of LLM-as-annotator against independent human judgment.
 
@@ -103,14 +103,14 @@ The 8 candidate rows affected by fixes 2 and 3 were re-sent to 8 fresh, independ
 
 ### Results (`phase2_scores.csv`), post-correction
 
-| mode | scope | n | precision | recall | F1 |
-|---|---|---|---|---|---|
-| name_only | equivalence_only | 25 | 0.875 | 0.955 | 0.913 |
-| name_only | equivalence_plus_subsumption | 39 | 0.921 | 0.972 | 0.946 |
-| name_only | recall_plus_nontrivial | 25 | 0.875 | 0.955 | 0.913 |
-| definition_based | equivalence_only | 25 | 0.952 | 0.909 | 0.930 |
-| definition_based | equivalence_plus_subsumption | 39 | 0.971 | 0.944 | 0.958 |
-| definition_based | recall_plus_nontrivial | 25 | 0.952 | 0.909 | 0.930 |
+| mode             | scope                        | n   | precision | recall | F1    |
+| ---------------- | ---------------------------- | --- | --------- | ------ | ----- |
+| name_only        | equivalence_only             | 25  | 0.875     | 0.955  | 0.913 |
+| name_only        | equivalence_plus_subsumption | 39  | 0.921     | 0.972  | 0.946 |
+| name_only        | recall_plus_nontrivial       | 25  | 0.875     | 0.955  | 0.913 |
+| definition_based | equivalence_only             | 25  | 0.952     | 0.909  | 0.930 |
+| definition_based | equivalence_plus_subsumption | 39  | 0.971     | 0.944  | 0.958 |
+| definition_based | recall_plus_nontrivial       | 25  | 0.952     | 0.909  | 0.930 |
 
 (`equivalence_only`/`recall_plus_nontrivial` scope dropped from n=26 to n=25 after the symmetric re-audit below softened `client-svc`'s gold relation from `equivalent` to `subsumed_by`, moving it out of those two scopes' filter; `equivalence_plus_subsumption`, the scope this report's headline numbers cite, is unaffected, since it already includes `subsumed_by` rows and scores on `lexicon_id` alone.)
 
@@ -119,6 +119,7 @@ The 8 candidate rows affected by fixes 2 and 3 were re-sent to 8 fresh, independ
 Per row, against gold: **TP (true positive)** is the binder asserting the exact correct lexicon entry. **FP (false positive)** is the binder confidently asserting a real lexicon entry that is wrong, whether gold wanted a different entry or no match at all. **FN (false negative)** is gold wanting a real match and the binder not producing it, whether it said `NONE` or asserted a different wrong entry. **TN (true negative)** is the binder correctly saying `NONE` when gold agrees. The three gold rows that genuinely should get `NONE` (`node-rule-group`, and, post-correction, `nsrlg` and `lifecycle-state`) are included in every scope, since correctly abstaining matters no matter how leniently subsumption is counted.
 
 **What precision, recall, and F1 actually are**, since the tables cite all three without defining them:
+
 - **Precision = TP / (TP + FP).** Of every case where a mode confidently asserted a specific lexicon entry, what fraction of those assertions were actually right. A mode with low precision is making confident wrong guesses often.
 - **Recall = TP / (TP + FN).** Of every gold row that genuinely needed a real match, what fraction the mode actually found, whether by a confident correct guess or not. A mode with low recall is missing real matches, either by wrongly saying `NONE` or by confidently guessing the wrong entry.
 - **F1 = 2 × (precision × recall) / (precision + recall).** The harmonic mean of the two, not a simple average. It only scores well when *both* precision and recall are reasonably high, a mode that is excellent on one but poor on the other gets pulled down toward the worse number rather than averaged generously. This is why F1, not precision or recall alone, is used as the single headline number throughout this report, and why it's still worth checking precision and recall individually rather than trusting F1 in isolation, see the note on the sklearn bug in `scripts/09_score_binding.py`'s history for a concrete case where F1 stayed unchanged while precision was badly broken.
@@ -143,14 +144,14 @@ The 39-row gold standard was at the low end of the plan's 30–60 target, domina
 
 ### Results (`phase2_scores.csv`), post-expansion, pre-LEX-003-fix (58 rows)
 
-| mode | scope | n | precision | recall | F1 |
-|---|---|---|---|---|---|
-| name_only | equivalence_only | 34 | 0.839 | 0.963 | 0.897 |
-| name_only | equivalence_plus_subsumption | 58 | 0.909 | 0.980 | 0.943 |
-| name_only | recall_plus_nontrivial | 34 | 0.839 | 0.963 | 0.897 |
-| definition_based | equivalence_only | 34 | 0.857 | 0.889 | 0.873 |
-| definition_based | equivalence_plus_subsumption | 58 | 0.885 | 0.902 | 0.893 |
-| definition_based | recall_plus_nontrivial | 34 | 0.857 | 0.889 | 0.873 |
+| mode             | scope                        | n   | precision | recall | F1    |
+| ---------------- | ---------------------------- | --- | --------- | ------ | ----- |
+| name_only        | equivalence_only             | 34  | 0.839     | 0.963  | 0.897 |
+| name_only        | equivalence_plus_subsumption | 58  | 0.909     | 0.980  | 0.943 |
+| name_only        | recall_plus_nontrivial       | 34  | 0.839     | 0.963  | 0.897 |
+| definition_based | equivalence_only             | 34  | 0.857     | 0.889  | 0.873 |
+| definition_based | equivalence_plus_subsumption | 58  | 0.885     | 0.902  | 0.893 |
+| definition_based | recall_plus_nontrivial       | 34  | 0.857     | 0.889  | 0.873 |
 
 On the full 58-row set: **name-only made 5 errors (TP 50, FP 5, FN 1, TN 3); definition-based made 7 (TP 46, FP 6, FN 5, TN 5).** Name-only is back in front, F1 0.943 vs. 0.893, a real gap this time, not the 39-row set's narrow 0.958-vs-0.946 result. This is exactly the outcome the 39-row limitations section warned about: *"a 2-to-5-error swing is enough to move the aggregate F1 comparison."* Nine new candidates landed as genuine, informative errors (5 for definition-based, 2 for name-only, discussed below), enough on their own to flip which mode leads. Neither the 39-row near-tie nor the 58-row gap should be read as the final word, the honest reading is that this lexicon/gold-standard's aggregate F1 comparison is still noisy at this sample size and the *error patterns* (below and in the sections above) are more stable and more informative than the single number.
 
@@ -172,14 +173,14 @@ LEX-003's definition was rewritten to remove the over-triggering vocabulary: it 
 
 ### Results (`phase2_scores.csv`), post-LEX-003-fix, pre-final-investigation (58 rows)
 
-| mode | scope | n | precision | recall | F1 |
-|---|---|---|---|---|---|
-| name_only | equivalence_only | 33 | 0.867 | 0.963 | 0.912 |
-| name_only | equivalence_plus_subsumption | 58 | 0.909 | 0.962 | 0.935 |
-| name_only | recall_plus_nontrivial | 33 | 0.867 | 0.963 | 0.912 |
-| definition_based | equivalence_only | 33 | 0.926 | 0.926 | 0.926 |
-| definition_based | equivalence_plus_subsumption | 58 | 0.923 | 0.923 | 0.923 |
-| definition_based | recall_plus_nontrivial | 33 | 0.926 | 0.926 | 0.926 |
+| mode             | scope                        | n   | precision | recall | F1    |
+| ---------------- | ---------------------------- | --- | --------- | ------ | ----- |
+| name_only        | equivalence_only             | 33  | 0.867     | 0.963  | 0.912 |
+| name_only        | equivalence_plus_subsumption | 58  | 0.909     | 0.962  | 0.935 |
+| name_only        | recall_plus_nontrivial       | 33  | 0.867     | 0.963  | 0.912 |
+| definition_based | equivalence_only             | 33  | 0.926     | 0.926  | 0.926 |
+| definition_based | equivalence_plus_subsumption | 58  | 0.923     | 0.923  | 0.923 |
+| definition_based | recall_plus_nontrivial       | 33  | 0.926     | 0.926  | 0.926 |
 
 On the full 58-row set at this point: **name-only made 5 errors (TP 50, FP 5, FN 2, TN 3); definition-based made 5 (TP 48, FP 4, FN 4, TN 5).** Both modes were down to the same number of errors, F1 0.935 vs. 0.923. **Definition-based's remaining errors traced to just two categories**: source descriptions too terse to disambiguate regardless of lexicon wording (`supporting-termination-point`, `client-svc`, `cep-list/connection-end-point`, 3 of 5), and two still-open, distinct issues (`supporting-network`'s malformed hedge response, `layer-protocol-name`'s path-context override). **Both investigated next.**
 
@@ -191,14 +192,14 @@ On the full 58-row set at this point: **name-only made 5 errors (TP 50, FP 5, FN
 
 ### Results (`phase2_scores.csv`), post-investigation (58 rows)
 
-| mode | scope | n | precision | recall | F1 |
-|---|---|---|---|---|---|
-| name_only | equivalence_only | 33 | 0.867 | 0.963 | 0.912 |
-| name_only | equivalence_plus_subsumption | 58 | 0.909 | 0.962 | 0.935 |
-| name_only | recall_plus_nontrivial | 33 | 0.867 | 0.963 | 0.912 |
-| definition_based | equivalence_only | 33 | 0.926 | 0.926 | 0.926 |
-| definition_based | equivalence_plus_subsumption | 58 | 0.942 | 0.942 | 0.942 |
-| definition_based | recall_plus_nontrivial | 33 | 0.926 | 0.926 | 0.926 |
+| mode             | scope                        | n   | precision | recall | F1    |
+| ---------------- | ---------------------------- | --- | --------- | ------ | ----- |
+| name_only        | equivalence_only             | 33  | 0.867     | 0.963  | 0.912 |
+| name_only        | equivalence_plus_subsumption | 58  | 0.909     | 0.962  | 0.935 |
+| name_only        | recall_plus_nontrivial       | 33  | 0.867     | 0.963  | 0.912 |
+| definition_based | equivalence_only             | 33  | 0.926     | 0.926  | 0.926 |
+| definition_based | equivalence_plus_subsumption | 58  | 0.942     | 0.942  | 0.942 |
+| definition_based | recall_plus_nontrivial       | 33  | 0.926     | 0.926  | 0.926 |
 
 On the full 58-row set at this point: **name-only made 5 errors (TP 50, FP 5, FN 2, TN 3); definition-based made 4 (TP 49, FP 3, FN 3, TN 5).** Definition-based ahead, F1 0.942 vs. 0.935, with the cleanest error story of any round so far: **3 of definition-based's 4 remaining errors are the identical failure mode**, source text too terse to state the fact needed to disambiguate (`supporting-termination-point`, `client-svc`, `cep-list/connection-end-point`), and the 4th (`supporting-network`) is most likely sampling noise on a genuinely borderline case, not a lexicon defect. Every fixable lexicon construct-validity problem found across all rounds so far (LEX-002/003/007's overlap, LEX-003's over-triggering, LEX-005's parent-context gap) had been fixed and confirmed via regression testing. **All 5 of name-only's errors were the same "false friend" pattern** it has shown in every round: a literal name or synonym match that means something different in context (`nsrlg`, `owned-node-edge-point`, `lifecycle-state`, `cep-list`, `client-layer-adaptation`). **Grown further next, to test whether this result holds at a larger n.**
 
@@ -208,14 +209,14 @@ On the full 58-row set at this point: **name-only made 5 errors (TP 50, FP 5, FN
 
 ### Results (`phase2_scores.csv`), final (72 rows, current)
 
-| mode | scope | n | precision | recall | F1 |
-|---|---|---|---|---|---|
-| name_only | equivalence_only | 40 | 0.829 | 0.935 | 0.879 |
-| name_only | equivalence_plus_subsumption | 72 | 0.896 | 0.952 | 0.923 |
-| name_only | recall_plus_nontrivial | 40 | 0.829 | 0.935 | 0.879 |
-| definition_based | equivalence_only | 40 | 0.906 | 0.935 | 0.921 |
-| definition_based | equivalence_plus_subsumption | 72 | 0.938 | 0.952 | 0.945 |
-| definition_based | recall_plus_nontrivial | 40 | 0.906 | 0.935 | 0.921 |
+| mode             | scope                        | n   | precision | recall | F1    |
+| ---------------- | ---------------------------- | --- | --------- | ------ | ----- |
+| name_only        | equivalence_only             | 40  | 0.829     | 0.935  | 0.879 |
+| name_only        | equivalence_plus_subsumption | 72  | 0.896     | 0.952  | 0.923 |
+| name_only        | recall_plus_nontrivial       | 40  | 0.829     | 0.935  | 0.879 |
+| definition_based | equivalence_only             | 40  | 0.906     | 0.935  | 0.921 |
+| definition_based | equivalence_plus_subsumption | 72  | 0.938     | 0.952  | 0.945 |
+| definition_based | recall_plus_nontrivial       | 40  | 0.906     | 0.935  | 0.921 |
 
 On the full 72-row set, current and final: **name-only made 7 errors (TP 60, FP 7, FN 3, TN 5); definition-based made 5 (TP 60, FP 4, FN 3, TN 7).** Definition-based's lead widened rather than narrowed with more data, F1 0.945 vs. 0.923, a bigger gap than at 58 rows (0.942 vs. 0.935), evidence this result is converging rather than being an artefact of small-n noise. **Definition-based's error profile stayed exactly as clean as before**: 3 of 5 remaining errors are the same terse-source-text limit already documented, `supporting-network` remains the likely-noise case, and one genuinely new error appeared, `network-id` ("Identifies a network.") was bound to `LEX-001 subsumed_by` rather than gold's `NONE`, the model reasoning that an identifier of a network is close enough to the node concept it contains, a single disagreement, not the convergent pattern that triggered gold revisions elsewhere in this study, so it stands as a genuine, if narrow, definition-based error on a real edge case (is an identifier of an out-of-scope concept itself out of scope, or does it inherit the nearest in-scope concept?). **Name-only picked up 2 new errors, both extending the false-friend pattern into a subtler variant**: `parent-node-edge-point` (gold LEX-002) was bound to LEX-007 with no literal synonym overlap at all, apparently generalising from the `owned-node-edge-point`/`cep-list` trap pattern rather than string-matching; and, most tellingly, `/networks/network` itself (gold `NONE`) was bound to `LEX-001 subsumes`, the model inferring "a network contains nodes, therefore network is broader than node" from the bare path and name alone, with no description text available in name-only mode to correct it. That last case is a clean, self-contained illustration of the study's core mechanism claim: name-only reasoning, even when it goes beyond literal string matching to structural inference, has no way to notice it has walked outside the lexicon's actual scope, while definition-based mode, given the same node's real description, correctly recognised the "network" concept as out of scope and answered `NONE`.
 
@@ -232,6 +233,7 @@ On the full 72-row set, current and final: **name-only made 7 errors (TP 60, FP 
 **Plan's original IETF trap** (`ietf-te-topology`'s `tunnel-termination-point`, gold = LEX-003): **both modes got this right**, because LEX-003's synonym list includes `tunnel-termination-point` verbatim (the plan's own worked example), name-only solves it by exact string match without needing the description.
 
 **The TAPI trap that actually differentiates the two modes** (`tapi-topology`'s `owned-node-edge-point`, gold = LEX-002):
+
 - name-only (real, blind): predicted **LEX-007** (`client-access-point`), wrong. (An earlier hand-simulated run guessed it would pick LEX-001 via the "node" substring; the real model's actual failure mode was different, which is itself a reminder that hand-simulating model behavior is not a substitute for calling the model.)
 - definition-based (real, blind): predicted **LEX-002**, correct, at confidence 0.75. The description ("NEPs belonging to / owned by this Node... 'own' the NEPs") frames NEPs as boundary sub-components *owned by* a node, matching LEX-002's genus rather than any competing entry.
 
@@ -253,12 +255,14 @@ The plan's §10 thresholds assume a single F1 number settles the question; acros
 The abstract result above turns into a concrete engineering decision the moment the goal is integrating two actual systems or network elements with AI assistance, recognising that "this field over here" and "that field over there" mean the same thing, so data, configuration, or alarms can flow correctly between them. The two approaches tested here have real, different operational profiles, not just different accuracy numbers.
 
 **Name-matching in practice** means building a lookup table, "System A calls it X, System B calls it Y, treat them as the same concept," and checking new fields against it.
+
 - Cheap and fast, a string comparison costs almost nothing to run at scale.
 - Only works for pairs someone already anticipated. The moment a third vendor, a new schema version, or an uncatalogued field name shows up, it either misses the match entirely or, worse, confidently matches to the *wrong* concept because the new name superficially resembles something already in the table (the `nsrlg` "sounds like shared-risk-group but means the opposite" problem from this study, in miniature).
 - Fails silently. A wrong match looks exactly as confident as a right one, there is no internal signal that anything went wrong, an integration built on it will push a wrong configuration or misroute an alarm with no warning until something breaks downstream.
 - Its maintenance burden grows with every new system integrated, since someone has to keep hand-updating the crosswalk table indefinitely.
 
 **Definition-reading in practice** means giving the AI each field's actual written description plus a shared reference dictionary of real definitions, and letting it reason about whether the meanings match.
+
 - More expensive per decision, genuine reasoning over text costs more compute and time than a lookup.
 - Generalises to systems never seen before. It does not need a human to have pre-catalogued this exact field name, only for the field to carry a real description, which it reads and reasons about independently.
 - Fails in a visible, flaggable way. When it fails, it is almost always because the source documentation itself was too thin to reason from, a detectable condition (a four-word description is a visible red flag) rather than a silent wrong answer.
