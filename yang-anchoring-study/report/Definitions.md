@@ -135,3 +135,22 @@ These distinctions were used to grade a real sample of network-configuration dat
 - **TAPI's failure mode was literal boilerplate.** ~23% of its descriptions were the unedited string `"none"`, a leftover from automated code generation, never replaced with real content.
 
 This is the concrete version of the abstract point above: neither corpus's problem was visible from field presence alone. It took a standard with a real definition of *definitional* to surface it. See `report/FINDINGS.md` §1 for the full audit.
+
+---
+
+## Gold Standard
+
+### Definition
+A gold standard is a hand-verified set of correct answers used to measure whether a system's outputs are accurate. It is not a definition of a concept itself, it is the accepted ground truth a model's predictions are graded against, the mechanism by which claims about definitional quality get tested rather than merely asserted.
+
+### Key Characteristics
+- Built by an expert from primary sources, independently of the system being tested.
+- Serves as the sole basis for scoring accuracy, precision, and recall, an accuracy number is only as meaningful as the answer key behind it.
+- Can itself contain errors, and should be revisited when a system's disagreement with it is unusually consistent or well-evidenced, rather than assumed infallible.
+- Distinct from a "silver standard" (labels generated automatically, or with lower confidence, rather than hand-verified against source material).
+
+### Example
+A row stating that the YANG node at `.../node/termination-point` corresponds to lexicon entry `LEX-002` ("link-termination-point"), hand-labelled by reading the actual IETF specification for that node, before any AI ever attempted to classify it.
+
+### Why It Matters (Ontology & A2A Context)
+Without an independently-established gold standard, there is no way to distinguish a system that reasons well from one that merely sounds confident, every accuracy claim needs something external to be measured against. But a gold standard is only as trustworthy as the process that built it: if a label is wrong, a system that disagrees with it is being penalized for being right, not rewarded for reasoning correctly. Treating a gold standard as immune to revision, rather than as a working hypothesis subject to the same scrutiny as the system under test, risks mistaking a labelling error for a reasoning failure, and drawing the wrong conclusion from a correct result.
