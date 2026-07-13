@@ -154,3 +154,22 @@ A row stating that the YANG node at `.../node/termination-point` corresponds to 
 
 ### Why It Matters (Ontology & A2A Context)
 Without an independently-established gold standard, there is no way to distinguish a system that reasons well from one that merely sounds confident, every accuracy claim needs something external to be measured against. But a gold standard is only as trustworthy as the process that built it: if a label is wrong, a system that disagrees with it is being penalized for being right, not rewarded for reasoning correctly. Treating a gold standard as immune to revision, rather than as a working hypothesis subject to the same scrutiny as the system under test, risks mistaking a labelling error for a reasoning failure, and drawing the wrong conclusion from a correct result.
+
+---
+
+## Definitional Anchoring (Grounding)
+
+### Definition
+Definitional anchoring is the use of a shared, external reference (a lexicon or ontology) as a common point that different, independently-named components can each be mapped onto, so that two items with completely different labels can be recognised as the same underlying concept.
+
+### Key Characteristics
+- The reference itself belongs to neither source vocabulary, it sits outside both, as neutral common ground.
+- Grounding is achieved only when a component is correctly mapped to the reference by meaning, not when it merely carries a label.
+- Requires reading and reasoning over meaning, not matching surface vocabulary, a synonym lookup can simulate grounding for cases its author already anticipated, but does not perform it.
+- Enables genuine interoperability: once two differently-named things are anchored to the same reference entry, a system can treat them as identical for reasoning purposes.
+
+### Example
+IETF's `termination-point` and TAPI's `NodeEdgePoint` share no vocabulary at all, but both correctly anchor to the same lexicon entry ("link-termination-point") once their actual descriptions, "a termination point can terminate a link" and "the NEPs belonging to / owned by this Node", are read and understood rather than pattern-matched.
+
+### Why It Matters (Ontology & A2A Context)
+Grounding is the prerequisite for any system that needs to reason across standards, vendors, or agents that do not share a vocabulary. A lexicon or ontology only provides commonality if something is actually anchoring components to it by meaning, a name-matching shortcut can only ground the specific name pairs its author already knew about in advance, and fails silently on any naming convention it has not seen. Genuine anchoring, achieved by reading a component's real definition and reasoning about what it means, generalises to naming conventions never seen before, which is what makes it valuable for A2A protocols and ontology engineering rather than a one-off mapping table.
